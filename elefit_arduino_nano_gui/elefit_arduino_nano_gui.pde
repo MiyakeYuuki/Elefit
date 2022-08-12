@@ -13,7 +13,6 @@ boolean reverse;
 boolean pump_1;
 boolean pump_2;
 boolean pump_3;
-
  
 Serial port;
  
@@ -22,8 +21,8 @@ ControlP5 cp5;
 void setup() {
  
   //size(800, 450);  // W:H = 16:9
-  size(1120, 630);  // W:H = 16:9
-  //size(1600, 900);  // W:H = 16:9
+  //size(1120, 630);  // W:H = 16:9
+  size(1600, 900);  // W:H = 16:9
   int font_size = width/56;
   cp5 = new ControlP5(this);
   PFont myFont = createFont("Arial",font_size,true);
@@ -156,10 +155,8 @@ void setup() {
 }
 
 void draw_gauge(int percentage, float y, String name) {
-  // int percentage = 0;
   int x = width/5;
   int font_size = width/56;
-  // y = height/20;
   
   int gauge_width = 3*width/5;
   int gauge_height = height/16;
