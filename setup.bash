@@ -9,4 +9,4 @@ sudo apt install -y pigpio python3-pigpio
 sudo apt install -y python-tk
 sudo apt install -y git
 sudo apt install -y hostapd dnsmasq iptables-persistent
-
+# aaaa
