@@ -1,5 +1,5 @@
 # What's elefit
-
+Elefit is a device used for DNA analysys preparation. It has a compact body so easy to move.
 
 # File Description
 ## elefit_for_raspberrypi_ver_num.py
