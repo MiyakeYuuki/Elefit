@@ -329,7 +329,7 @@ void Collecting() {
   }
 }
  
- 
+// Function to execute all process
 void AllPhase() {
   if(process_toggle_flag == false && process_button_flag == false){
     remaining_time = need_washing_time + (need_loading_time+322) + need_collecting_time;
@@ -402,7 +402,7 @@ void Close() {
 // 
 //------------------------
 class Com_Washing extends Thread {
-  // 実行許可FLG
+  // FLG
   private boolean running = true;
   
   @Override
@@ -663,7 +663,7 @@ class Com_LoadingCollecting extends Thread {
 
     }
   }
-  // メイン側より停止指示を受け取るメソッド
+
   public void stopRunning(){
     process_button_flag = false;
     running = false;
@@ -671,7 +671,7 @@ class Com_LoadingCollecting extends Thread {
 }
 
 class Com_Discharge extends Thread {
-  // 実行許可FLG
+  // FLG
   private boolean running = true;
   
   @Override
