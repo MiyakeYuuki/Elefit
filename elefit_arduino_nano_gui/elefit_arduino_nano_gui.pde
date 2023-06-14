@@ -234,7 +234,7 @@ void draw_gauge(int percentage, float y, String name) {
   text("%", 3*x/2+gauge_width, y+gauge_height);         
 }
 
- 
+// Function to draw all gauge, control pump
 void draw() {    
   int font_size = width/56;
   background(200);
@@ -399,7 +399,7 @@ void Close() {
 }
 
 //------------------------
-// 
+// All washing process
 //------------------------
 class Com_Washing extends Thread {
   // FLG
@@ -454,6 +454,10 @@ class Com_Washing extends Thread {
   }
 }
 
+//------------------------
+// All loading process
+//------------------------
+
 class Com_Loading extends Thread {
   // FLG
   private boolean running = true;
@@ -502,6 +506,10 @@ class Com_Loading extends Thread {
   }  
 }
 
+
+//------------------------
+// All collecting process
+//------------------------
 class Com_Collecting extends Thread {
   // FLG
   private boolean running = true;
@@ -575,6 +583,9 @@ class Com_Collecting extends Thread {
   }  
 }
 
+//------------------------
+// All process(phase)
+//------------------------
 class Com_AllPhase extends Thread {
 
   private boolean running = true;
