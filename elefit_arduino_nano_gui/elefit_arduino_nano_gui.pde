@@ -207,30 +207,30 @@ void draw_gauge(int percentage, float y, String name) {
   int gauge_width = 3*width/5;
   int gauge_height = height/16;
   
+  //ゲージの下地描画
+  fill(255);              //色指定
+  rect(x, y, gauge_width, gauge_height);        //ゲージの下地描画
   
-  fill(255);              
-  rect(x, y, gauge_width, gauge_height);        
-  
-  fill(0);            
-
-  textSize(1.5*font_size);              
+  fill(0);            //色指定
+  //横軸表示
+  textSize(1.5*font_size);              //テキストサイズ
   text(name, x/4, y+gauge_height-10);  // name
   textSize(font_size);
-  textAlign(CENTER);          
+  textAlign(CENTER);          //中央揃え
   text(  0, x, y+3*gauge_height/2);   //0
   text(50, x+gauge_width/2, y+3*gauge_height/2);   //50
   text(100, x+gauge_width, y+3*gauge_height/2);   //100
-  
-  fill(0,128,0);               
-  rect(x, y, percentage*gauge_width/100, gauge_height); 
-  fill(color(0, 128, 0));                 
-    
-  textSize(1.5*font_size);                  
-  textAlign(RIGHT);              
+  //ゲージ表示
+  fill(0,128,0);              //色指定 
+  rect(x, y, percentage*gauge_width/100, gauge_height); //横棒描画
+  fill(color(0, 128, 0));        //色指定         
+  //パーセンテージ表示  
+  textSize(1.5*font_size);                  //テキストサイズ
+  textAlign(RIGHT);              //右揃え
   text(percentage, 3*x/2+gauge_width, y+gauge_height);  
-  
-  textSize(font_size);                  
-  textAlign(LEFT);               
+  //%表示
+  textSize(font_size);                  //テキストサイズ
+  textAlign(LEFT);               //左揃え
   text("%", 3*x/2+gauge_width, y+gauge_height);         
 }
 
@@ -247,9 +247,9 @@ void draw() {
   draw_gauge((int)(min(100, 100*loading_time/(need_loading_time+322))), 5*height/36, "Loading");
   draw_gauge((int)(min(100, 100*collecting_time/need_collecting_time)), 9*height/36, "Collecting");
   draw_gauge((int)(min(100, 100*discharge_time/need_discharge_time)), 13*height/36, "Discharge");
-
+  // 残り時間表示
   fill(color(0));
-  textSize(1.5*font_size);                  
+  textSize(1.5*font_size);                  //テキストサイズ
   text("The Remaining Time", 2*width/3, 9*height/14);
   
   temp = remaining_time;
@@ -399,10 +399,10 @@ void Close() {
 }
 
 //------------------------
-// All washing process
+// All washing process（ここからサブスレッド）
 //------------------------
 class Com_Washing extends Thread {
-  // FLG
+  // 実行許可FLG
   private boolean running = true;
   
   @Override
@@ -447,7 +447,7 @@ class Com_Washing extends Thread {
       }
     }
   }
-
+  // メイン側より停止指示を受け取るメソッド
   public void stopRunning(){
     process_button_flag = false;
     running = false;
@@ -459,7 +459,7 @@ class Com_Washing extends Thread {
 //------------------------
 
 class Com_Loading extends Thread {
-  // FLG
+  // 実行許可FLG
   private boolean running = true;
   
   @Override
@@ -499,7 +499,7 @@ class Com_Loading extends Thread {
       
     }
   }
-  
+  // メイン側より停止指示を受け取るメソッド
   public void stopRunning(){
     process_button_flag = false;
     running = false;
@@ -511,7 +511,7 @@ class Com_Loading extends Thread {
 // All collecting process
 //------------------------
 class Com_Collecting extends Thread {
-  // FLG
+  // 実行許可FLG
   private boolean running = true;
   
   @Override
@@ -576,7 +576,7 @@ class Com_Collecting extends Thread {
     }
 
   }
-
+  // メイン側より停止指示を受け取るメソッド
   public void stopRunning(){
     process_button_flag = false;
     running = false;
@@ -587,7 +587,7 @@ class Com_Collecting extends Thread {
 // All process(phase)
 //------------------------
 class Com_AllPhase extends Thread {
-
+  // 実行許可FLG
   private boolean running = true;
   
   @Override
@@ -632,7 +632,7 @@ class Com_AllPhase extends Thread {
 
     }
   }
-
+  // メイン側より停止指示を受け取るメソッド
   public void stopRunning(){
     process_button_flag = false;
     running = false;
@@ -640,7 +640,7 @@ class Com_AllPhase extends Thread {
 }
 
 class Com_LoadingCollecting extends Thread {
-  // FLG
+  // 実行許可FLG
   private boolean running = true;
   
   @Override
@@ -674,7 +674,7 @@ class Com_LoadingCollecting extends Thread {
 
     }
   }
-
+  // メイン側より停止指示を受け取るメソッド
   public void stopRunning(){
     process_button_flag = false;
     running = false;
@@ -682,7 +682,7 @@ class Com_LoadingCollecting extends Thread {
 }
 
 class Com_Discharge extends Thread {
-  // FLG
+  // 実行許可FLG
   private boolean running = true;
   
   @Override
@@ -721,7 +721,7 @@ class Com_Discharge extends Thread {
       }
     }
   }
-  
+  // メイン側より停止指示を受け取るメソッド
   public void stopRunning(){
     process_button_flag = false;
     running = false;
