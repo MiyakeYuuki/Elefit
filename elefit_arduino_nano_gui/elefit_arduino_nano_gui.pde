@@ -297,7 +297,7 @@ void draw() {
 
 }
 
- 
+/*「WASHING」ボタンが押されたときに実行される関数 */
 void Washing() {
   if(process_toggle_flag == false && process_button_flag == false){
     remaining_time = need_washing_time;
@@ -307,7 +307,7 @@ void Washing() {
     Washing_exe.start();
   }
 }
- 
+/*「LOADING」ボタンが押されたときに実行される関数 */
 void Loading() {
   if(process_toggle_flag == false && process_button_flag == false){
     remaining_time = need_loading_time + 322;
@@ -318,7 +318,7 @@ void Loading() {
   }
 }
 
-
+/*「COLLECTING」ボタンが押されたときに実行される関数 */
 void Collecting() {
   if(process_toggle_flag == false && process_button_flag == false){
     remaining_time = need_collecting_time;
@@ -329,7 +329,7 @@ void Collecting() {
   }
 }
  
-// Function to execute all process
+/*「ALL PHASE」ボタンが押されたときに実行される関数 */
 void AllPhase() {
   if(process_toggle_flag == false && process_button_flag == false){
     remaining_time = need_washing_time + (need_loading_time+322) + need_collecting_time;
@@ -342,7 +342,7 @@ void AllPhase() {
     AllPhase_exe.start();
   }
 }
- 
+/*「LOADING COLLECTING」ボタンが押されたときに実行される関数 */
 void LoadingCollecting() {
   if(process_toggle_flag == false && process_button_flag == false){
     remaining_time = need_loading_time + 322 + need_collecting_time;
@@ -356,19 +356,19 @@ void LoadingCollecting() {
 }
 
 
-
+/*「FRONT」ボタンが押されたときに実行される関数 */
 void Front() {
   if(process_toggle_flag == false && process_button_flag == false){
     port.write("step_front,10,0\n");
   }
 }
-
+/*「BACK」ボタンが押されたときに実行される関数 */
 void Back() {
   if(process_toggle_flag == false && process_button_flag == false){
     port.write("step_back,10,0\n");
   }
 }
-
+/*「DISCHARGE」ボタンが押されたときに実行される関数 */
 void Discharge() {
   if(process_toggle_flag == false && process_button_flag == false){
     remaining_time = need_discharge_time;
@@ -379,7 +379,7 @@ void Discharge() {
     Discharge_exe.start();
   }
 }
-
+/*「CLOSE」ボタンが押されたときに実行される関数 */
 void Close() {
   start_washing_time = 10000000;
   start_loading_time = 10000000;

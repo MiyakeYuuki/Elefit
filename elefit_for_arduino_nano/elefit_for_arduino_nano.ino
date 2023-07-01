@@ -60,7 +60,7 @@ void setup() {
 }
 
 
-void(*resetFunc)(void) = 0;
+void(*resetFunc)(void) = 0; // Arduinoをリセットボタンでなく、プログラムからリセットするための関数
 
 void loop() {
   if (Serial.available()) {
@@ -97,29 +97,29 @@ void loop() {
             elements[received_elements_num] = line.substring(beginIndex);
         }
     }
-    if(elements[0] == "step_front"){
+    if(elements[0] == "step_front"){ // ステッピングモータを駆動してカラムを前方に動かす
       Serial.println(elements[0]);
       step_front(elements[1].toInt());
     }
-    else if(elements[0] == "step_back"){
+    else if(elements[0] == "step_back"){  // ステッピングモータを駆動してカラムを後方に動かす
       Serial.println(elements[0]);
       step_back(elements[1].toInt());   
     }
-    else if(elements[0] == "on_pump_12ch"){
+    else if(elements[0] == "on_pump_12ch"){  // 6chポンプ×2を駆動
       Serial.println(elements[0]);
       Serial.println(elements[1]);
       Serial.println(elements[2]);
       on_pump_12ch(elements[1].toInt(),elements[2].toInt()); 
     }
-    else if(elements[0] == "pwm_pump_12ch"){
+    else if(elements[0] == "pwm_pump_12ch"){  // 6ch×2のポンプをわずかに正転させ、停止する
       Serial.println(elements[0]);
       pwm_pump_12ch(); 
     }
-    else if(elements[0] == "off_pump_12ch"){
+    else if(elements[0] == "off_pump_12ch"){  // 6chポンプ×2を停止
       Serial.println(elements[0]);
       off_pump_12ch(); 
     }
-    else if(elements[0] == "on_pump_dba"){
+    else if(elements[0] == "on_pump_dba"){  // ダイヤフラムポンプを駆動
       Serial.println(elements[0]);
       if(elements[1].toInt() == 1){
         digitalWrite(PWM_PORT_M1_1, HIGH);
@@ -131,12 +131,12 @@ void loop() {
         digitalWrite(PWM_PORT_M3_1, HIGH);
       }
     }
-    else if(elements[0] == "off_pump_dba"){
+    else if(elements[0] == "off_pump_dba"){ // ダイヤフラムポンプを停止
       Serial.println(elements[0]);
       digitalWrite(PWM_PORT_M1_1, LOW);
       digitalWrite(PWM_PORT_M2_1, LOW);
       digitalWrite(PWM_PORT_M3_1, LOW);
-    }else if(elements[0] == "reset_arduino"){
+    }else if(elements[0] == "reset_arduino"){ // Ardrinoをリセットする（動作はリセットボタンを押したときと同じ）
       Serial.println(elements[0]);
       delay(100);
       resetFunc();
@@ -144,7 +144,7 @@ void loop() {
     elements[0] == "\0";    // 文字列の初期化
   }
 }
-
+/* ステッピングモータを駆動してカラムを前方に動かす関数 */
 int step_front(int step){
   digitalWrite(STEP_PORT_2, HIGH);
   digitalWrite(STEP_PORT_4, HIGH);
@@ -162,7 +162,7 @@ int step_front(int step){
   digitalWrite(STEP_PORT_2, LOW);
   digitalWrite(STEP_PORT_4, LOW);
 }
-
+/* ステッピングモータを駆動してカラムを後方に動かす関数 */
 int step_back(int step){
   digitalWrite(STEP_PORT_2, HIGH);
   digitalWrite(STEP_PORT_4, HIGH);
@@ -184,7 +184,7 @@ int step_back(int step){
   digitalWrite(STEP_PORT_2, LOW);
   digitalWrite(STEP_PORT_4, LOW);
 }
-
+/* 6ch×2のポンプ正転・逆転する関数 */
 int on_pump_12ch(int speed,bool rev){
   if(rev == 0){
     analogWrite(PWM_PORT_M4_1, speed * 2.55);
@@ -196,14 +196,14 @@ int on_pump_12ch(int speed,bool rev){
     
   }
 }
-
+/* 6ch×2のポンプ停止する関数 */
 void off_pump_12ch(){
   digitalWrite(PWM_PORT_M4_1, LOW);
   digitalWrite(PWM_PORT_M4_2, LOW);
   digitalWrite(PWM_PORT_M5_1, LOW);
   digitalWrite(PWM_PORT_M5_2, LOW);
 }
-
+/* 6ch×2のポンプをわずかに正転させ、停止する関数 */
 void pwm_pump_12ch(){
   on_pump_12ch(80,0);
   delay(385);
