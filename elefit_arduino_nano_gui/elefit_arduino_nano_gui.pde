@@ -409,7 +409,7 @@ class Com_Washing extends Thread {
   public void run(){
     process_button_flag = true;
     port.write("step_front,50,0\n");        //Stepping motor moves forward 50 steps
-    delay(1000);                            
+    delay(1000);  //単位はms                            
     port.write("step_back,200,0\n");        //Stepping motor moves backward 200 steps
     delay(1000);
     
