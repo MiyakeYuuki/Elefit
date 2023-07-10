@@ -13,7 +13,7 @@ long start_allphase_time = 10000000;
 long start_loadingcollecting_time =  10000000;
 long start_discharge_time =  10000000;
 long remaining_time = 0;
-int slp = 300;               //Time of Soak in Nitric
+int slp = 300;               //Time of Soak in Nitric(5 min)
 boolean pump_12ch;  //6ch*2 pump
 boolean reverse;
 boolean pump_1;     //Diaphragm pump*3
