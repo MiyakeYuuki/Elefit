@@ -564,7 +564,7 @@ class Com_Collecting extends Thread {
           port.write("step_back,180,0\n");        //Stepping motor moves backward 180 steps
           delay(5100); 
       }else if(coll_Pase1 + coll_Pase2 + coll_Pase3 + coll_Pase4 + coll_Pase5 + 15 <= ((millis()/1000)-start_collecting_time) && ((millis()/1000)-start_collecting_time) <coll_Pase1 + coll_Pase2 + coll_Pase3 + coll_Pase4 + coll_Pase5 + coll_Pase6 + 15){           //12ch_Pump reverse activation for 250 sec(184～434sec). Phase6
-          port.write("on_pump_12ch,100,1\n");     //12ch_Pump reverse activation
+          port.write("on_pump_12ch,100,0\n");     //12ch_Pump activation
           delay(1000); 
       }else{
           port.write("off_pump_12ch,0,0\n");      //Stop 12ch_Pump
