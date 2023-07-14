@@ -465,7 +465,7 @@ class Com_Loading extends Thread {
   @Override
   public void run(){
     process_button_flag = true;
-    slp = need_loading_time;
+    // slp = need_loading_time; Phase2の3を修正
     start_loading_time = (long)millis()/1000;
     
     //PaseTime[sec]
