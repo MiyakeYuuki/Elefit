@@ -469,25 +469,49 @@ class Com_Loading extends Thread {
     start_loading_time = (long)millis()/1000;
     
     //PaseTime[sec]
-    int load_Phase1 = 18;
-    int load_Phase2 = 53;
-    int load_Phase3 = slp;
-    int load_Phase4 = 250;
+    int load_Phase1 = 18;  // 中間層に硝酸を送る時間
+    int load_Phase2 = 53;  // カラムに酢酸を満たす時間
+    int load_Phase3 = slp; // 放置する時間 slp=300[sec]=5[min]
+    int load_Phase4 = 250;  // 中間層の酢酸を廃液トレイに排出する時間
+    int load_Phase5 = 5;  // 中間層に純水を入れる時間(4.5 mLになるように調整）
+    int load_Phase6 = 60; // 中間層の純水+硝酸を廃液トレイにすべて排出する時間
     
     while(running){
       if(0 <= ((millis()/1000)-start_loading_time) && ((millis()/1000)-start_loading_time) < load_Phase1){                  //PumpB activation for 18 sec(0～18sec). Phase1
           port.write("on_pump_dba,2,0\n");       //PumpB activation
           delay(1000); 
-      }else if(load_Phase1 <= ((millis()/1000)-start_loading_time) && ((millis()/1000)-start_loading_time) < load_Phase1 + 1){           //Stop PumpB(18～19sec)
-          port.write("off_pump_dba,0,0\n");      //Stop PumpB
-          delay(200); 
-      }else if(load_Phase1 + 1 <= ((millis()/1000)-start_loading_time) && ((millis()/1000)-start_loading_time) < load_Phase1 + load_Phase2 + 1){           //12ch_Pump activation for 53 sec(19～72sec). Phase2
+      }else if(load_Phase1 <= ((millis()/1000)-start_loading_time) && ((millis()/1000)-start_loading_time) < load_Phase1 + load_Phase2){           //12ch_Pump activation for 53 sec(19～72sec). Phase2
+          port.write("off_pump_dba,2,0\n");      //Stop PumpB
           port.write("on_pump_12ch,100,0\n");    //12ch_Pump activation
           delay(1000); 
-      }else if(load_Phase1 + load_Phase2 + 1 <= ((millis()/1000)-start_loading_time) && ((millis()/1000)-start_loading_time) < load_Phase1 + load_Phase2 + load_Phase3 + 1){       //Stop 12ch_Pump. Standby for slp [sec](72～ 72+slp [sec]). Phase3
+      }else if(load_Phase1 + load_Phase2 <= ((millis()/1000)-start_loading_time) && ((millis()/1000)-start_loading_time) < load_Phase1 + load_Phase2 + load_Phase3){       //Stop 12ch_Pump. Standby for slp [sec](72～ 72+slp [sec]). Phase3
           port.write("off_pump_12ch,0,0\n");     //Stop 12ch_Pump
           delay(1000); 
-      }else if(load_Phase1 + load_Phase2 + load_Phase3 + 1 <= ((millis()/1000)-start_loading_time) && ((millis()/1000)-start_loading_time) < load_Phase1 + load_Phase2 + load_Phase3 + load_Phase4 + 1){  //12ch_Pump activation for 250 sec(72+slp ～ 322+slp [sec]). Phase4
+      }else if(load_Phase1 + load_Phase2 + load_Phase3 <= ((millis()/1000)-start_loading_time) && ((millis()/1000)-start_loading_time) < load_Phase1 + load_Phase2 + load_Phase3 + load_Phase4){  //12ch_Pump activation for 250 sec(72+slp ～ 322+slp [sec]). Phase4
+          port.write("on_pump_12ch,100,0\n");    //12ch_Pump activation
+          delay(1000); 
+      }else if(load_Phase1 + load_Phase2 + load_Phase3 + load_Phase4 <= ((millis()/1000)-start_loading_time) && ((millis()/1000)-start_loading_time) < load_Phase1 + load_Phase2 + load_Phase3 + load_Phase4 + load_Phase5){  //PumpB activation for 5 sec( ～ [sec]). Phase5
+          port.write("off_pump_12ch,0,0\n");     //Stop 12ch_Pump
+          port.write("on_pump_dba,3,0\n");       //PumpC activation
+          delay(1000); 
+      }else if(load_Phase1 + load_Phase2 + load_Phase3 + load_Phase4 + load_Phase5 <= ((millis()/1000)-start_loading_time) && ((millis()/1000)-start_loading_time) < load_Phase1 + load_Phase2 + load_Phase3 + load_Phase4 + load_Phase5 + load_Phase6){  //12ch_Pump activation for 60 sec( ～ [sec]). Phase6
+          port.write("off_pump_dba,3,0\n");      //Stop PumpB
+          port.write("on_pump_12ch,100,0\n");    //12ch_Pump activation
+          delay(1000);
+      }else if(load_Phase1 + load_Phase2 + load_Phase3 + load_Phase4 + load_Phase5 + load_Phase6 <= ((millis()/1000)-start_loading_time) && ((millis()/1000)-start_loading_time) < load_Phase1 + load_Phase2 + load_Phase3 + load_Phase4 + load_Phase5*2 + load_Phase6){  // Phase5(2回目)
+          port.write("off_pump_12ch,0,0\n");     //Stop 12ch_Pump
+          port.write("on_pump_dba,3,0\n");       //PumpC activation
+          delay(1000); 
+      }else if(load_Phase1 + load_Phase2 + load_Phase3 + load_Phase4 + load_Phase5*2 + load_Phase6 <= ((millis()/1000)-start_loading_time) && ((millis()/1000)-start_loading_time) < load_Phase1 + load_Phase2 + load_Phase3 + load_Phase4 + load_Phase5*2 + load_Phase6*2){  // Phase6(2回目)
+          port.write("off_pump_dba,3,0\n");      //Stop PumpB
+          port.write("on_pump_12ch,100,0\n");    //12ch_Pump activation
+          delay(1000); 
+      }else if(load_Phase1 + load_Phase2 + load_Phase3 + load_Phase4 + load_Phase5*2 + load_Phase6*2 <= ((millis()/1000)-start_loading_time) && ((millis()/1000)-start_loading_time) < load_Phase1 + load_Phase2 + load_Phase3 + load_Phase4 + load_Phase5*3 + load_Phase6*2){  // Phase5(3回目)
+          port.write("off_pump_12ch,0,0\n");     //Stop 12ch_Pump
+          port.write("on_pump_dba,3,0\n");       //PumpC activation
+          delay(1000); 
+      }else if(load_Phase1 + load_Phase2 + load_Phase3 + load_Phase4 + load_Phase5*3 + load_Phase6*2 <= ((millis()/1000)-start_loading_time) && ((millis()/1000)-start_loading_time) < load_Phase1 + load_Phase2 + load_Phase3 + load_Phase4 + load_Phase5*3 + load_Phase6*3){  // Phase6(3回目)
+          port.write("off_pump_dba,3,0\n");      //Stop PumpB
           port.write("on_pump_12ch,100,0\n");    //12ch_Pump activation
           delay(1000); 
       }else{
