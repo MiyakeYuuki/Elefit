@@ -2,9 +2,9 @@ import controlP5.*;  //GUI package for processing
 import processing.serial.*; //Package for Serial communication between an Arduino
 
 long temp_Correct = 0;
-final long need_washing_time = 765;
-int need_loading_time;
-final long need_collecting_time = 434;
+final long need_washing_time = 695;
+int need_loading_time = 686;
+final long need_collecting_time = 419;
 final long need_discharge_time = 300;
 long start_washing_time = 10000000;
 long start_loading_time = 10000000;
@@ -414,10 +414,10 @@ class Com_Washing extends Thread {
     delay(1000);
     
     //PaseTime[sec]
-    int wash_phase1 = 20;
-    int wash_phase2 = 42;
-    int wash_phase3 = 600;
-    int wash_phase4 = 100;
+    int wash_phase1 = 20;  // 酢酸を中間層に入れる時間(45 mlになるように調整)
+    int wash_phase2 = 45;  // 酢酸をカラムに満たす時間
+    int wash_phase3 = 600;  // 酢酸を流し続ける時間
+    int wash_phase4 = 30;  // カラムに残った酢酸を排出する時間
     
     start_washing_time = (long)millis()/1000;
     while(running){
@@ -469,7 +469,7 @@ class Com_Loading extends Thread {
     start_loading_time = (long)millis()/1000;
     
     //PaseTime[sec]
-    int load_Phase1 = 18;  // 中間層に硝酸を送る時間
+    int load_Phase1 = 18;  // 中間層に硝酸を送る時間(40 mlになるように調整)
     int load_Phase2 = 53;  // カラムに酢酸を満たす時間
     int load_Phase3 = slp; // 放置する時間 slp=300[sec]=5[min]
     int load_Phase4 = 250;  // 中間層の酢酸を廃液トレイに排出する時間
