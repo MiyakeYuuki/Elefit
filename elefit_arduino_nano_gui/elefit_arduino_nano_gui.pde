@@ -414,7 +414,7 @@ class Com_Washing extends Thread {
     delay(1000);
     
     //PaseTime[sec]
-    int wash_phase1 = 20;  // 酢酸を中間層に入れる時間(45 mlになるように調整)
+    int wash_phase1 = 18;  // 酢酸を中間層に入れる時間(45 mlになるように調整)
     int wash_phase2 = 45;  // 酢酸をカラムに満たす時間
     int wash_phase3 = 600;  // 酢酸を流し続ける時間
     int wash_phase4 = 30;  // カラムに残った酢酸を排出する時間
