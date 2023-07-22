@@ -471,8 +471,8 @@ class Com_Loading extends Thread {
     //PaseTime[sec]
     int load_Phase1 = 18;  // 中間層に硝酸を送る時間(40 mlになるように調整)
     int load_Phase2 = 53;  // カラムに酢酸を満たす時間
-    int load_Phase3 = slp; // 放置する時間 slp=300[sec]=5[min]
-    int load_Phase4 = 250;  // 中間層の酢酸を廃液トレイに排出する時間
+    int load_Phase3 = 5; // 放置する時間 slp=300[sec]=5[min]
+    int load_Phase4 = 5;  // 中間層の酢酸を廃液トレイに排出する時間 250→5
     int load_Phase5 = 5;  // 中間層に純水を入れる時間(4.5 mLになるように調整）
     int load_Phase6 = 60; // 中間層の純水+硝酸を廃液トレイにすべて排出する時間
     

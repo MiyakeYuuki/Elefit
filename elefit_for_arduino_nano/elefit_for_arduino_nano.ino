@@ -22,7 +22,8 @@
 int PWM_RANGE     = 100; //Maximum value of generated PWM(1~100)
 int FREQ          = 100; //pwm frequency (Hz)
 int reverse = 0;         //12chpump reverse func
-int speed   = 100;       //12chpump revsepeed
+int speed1 = 100;       //12chpump revsepeed
+int speed2 = 100;       //12chpump revsepeed
 
 static String elements[ELEMENTS_NUM];
 static int received_elements_num = 0; /**< 受信済み文字列の数 */
@@ -187,12 +188,12 @@ int step_back(int step){
 /* 6ch×2のポンプ正転・逆転する関数 */
 int on_pump_12ch(int speed,bool rev){
   if(rev == 0){
-    analogWrite(PWM_PORT_M4_1, speed * 2.55);
-    analogWrite(PWM_PORT_M5_2, speed * 2.55);
+    analogWrite(PWM_PORT_M4_1, speed1 * 2.55);
+    analogWrite(PWM_PORT_M5_2, speed2 * 2.55);
   }
   else if(rev == 1){
-    analogWrite(PWM_PORT_M4_2, speed * 2.55);
-    analogWrite(PWM_PORT_M5_1, speed * 2.55);
+    analogWrite(PWM_PORT_M4_2, speed1 * 2.55);
+    analogWrite(PWM_PORT_M5_1, speed2 * 2.55);
     
   }
 }
