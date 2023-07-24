@@ -469,11 +469,11 @@ class Com_Loading extends Thread {
     start_loading_time = (long)millis()/1000;
     
     //PaseTime[sec]
-    int load_Phase1 = 18;  // 中間層に硝酸を送る時間(40 mlになるように調整)
+    int load_Phase1 = 19;  // 中間層に硝酸を送る時間(40 mlになるように調整)
     int load_Phase2 = 53;  // カラムに酢酸を満たす時間
-    int load_Phase3 = 5; // 放置する時間 slp=300[sec]=5[min]
-    int load_Phase4 = 5;  // 中間層の酢酸を廃液トレイに排出する時間 250→5
-    int load_Phase5 = 5;  // 中間層に純水を入れる時間(4.5 mLになるように調整）
+    int load_Phase3 = slp; // 放置する時間 slp=300[sec]=5[min]
+    int load_Phase4 = 250;  // 中間層の酢酸を廃液トレイに排出する時間
+    int load_Phase5 = 4;  // 中間層に純水を入れる時間(4.5 mLになるように調整）
     int load_Phase6 = 60; // 中間層の純水+硝酸を廃液トレイにすべて排出する時間
     
     while(running){
@@ -543,12 +543,12 @@ class Com_Collecting extends Thread {
     process_button_flag = true;
     start_collecting_time = (long)millis()/1000;
     //PaseTime[sec]
-    int coll_Pase1 = 18;
-    int coll_Pase2 = 55;
-    int coll_Pase3 = 5;
-    int coll_Pase4 = 86;
-    int coll_Pase5 = 5;
-    int coll_Pase6 = 250;
+    int coll_Pase1 = 10;  // 純水を中間層に入れる時間(20 mlになるように調整)
+    int coll_Pase2 = 55;  // カラムの下に純水を満たす時間
+    int coll_Pase3 = 5;  // ポンプを逆転させる時間
+    int coll_Pase4 = 86;  // 試験管に純水を入れる時間
+    int coll_Pase5 = 5;  // ポンプを逆転させる時間  
+    int coll_Pase6 = 250;  // 中間層に残った純水を廃液トレイに排出する時間
     
     while(running){
       if(0 <= ((millis()/1000)-start_collecting_time) && ((millis()/1000)-start_collecting_time) < coll_Pase1){                  //PumpC activation for 18 sec(0～18sec). Phase1
