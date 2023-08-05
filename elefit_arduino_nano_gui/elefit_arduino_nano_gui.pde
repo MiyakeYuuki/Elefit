@@ -548,7 +548,7 @@ class Com_Collecting extends Thread {
     int coll_Pase3 = 5;  // ポンプを逆転させる時間
     int coll_Pase4 = 60;  // 試験管に純水を入れる時間
     int coll_Pase5 = 5;  // ポンプを逆転させる時間  
-    int coll_Pase6 = 110;  // 中間層に残った純水を廃液トレイに排出する時間
+    int coll_Pase6 = 200;  // 中間層に残った純水を廃液トレイに排出する時間
     
     while(running){
       if(0 <= ((millis()/1000)-start_collecting_time) && ((millis()/1000)-start_collecting_time) < coll_Pase1){                  //PumpC activation for 18 sec(0～18sec). Phase1

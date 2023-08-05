@@ -22,8 +22,8 @@
 int PWM_RANGE     = 100; //Maximum value of generated PWM(1~100)
 int FREQ          = 100; //pwm frequency (Hz)
 int reverse = 0;         //12chpump reverse func
-int speed1 = 100;       //12chpump revsepeed
-int speed2 = 100;       //12chpump revsepeed
+int speed1 = 100;       //12chpump(R) revsepeed
+int speed2 = 100;       //12chpump(L) revsepeed
 
 static String elements[ELEMENTS_NUM];
 static int received_elements_num = 0; /**< 受信済み文字列の数 */
