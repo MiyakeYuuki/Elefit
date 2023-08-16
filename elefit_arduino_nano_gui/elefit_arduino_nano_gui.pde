@@ -2,8 +2,8 @@ import controlP5.*;  //GUI package for processing
 import processing.serial.*; //Package for Serial communication between an Arduino
 
 long temp_Correct = 0;
-final long need_washing_time = 695;
-int need_loading_time = 686;
+final long need_washing_time = 693+5;
+int need_loading_time = 817;
 final long need_collecting_time = 419;
 final long need_discharge_time = 300;
 long start_washing_time = 10000000;
