@@ -163,7 +163,7 @@ void setup() {
     
   cp5.getController("need_loading_time")
     .getCaptionLabel()
-    .setVisible(true) 
+    .setVisible(false) 
     .toUpperCase(false)
     .align(ControlP5.LEFT, ControlP5.BOTTOM_OUTSIDE) ;
   
@@ -244,7 +244,7 @@ void draw() {
   long collecting_time = (long)max(0, (millis()/1000)-start_collecting_time);
   long discharge_time = (long)max(0, (millis()/1000)-start_discharge_time);
   draw_gauge((int)(min(100, 100*washing_time/need_washing_time)), height/36, "Washing");
-  draw_gauge((int)(min(100, 100*loading_time/(need_loading_time+322))), 5*height/36, "Loading");
+  draw_gauge((int)(min(100, 100*loading_time/(need_loading_time))), 5*height/36, "Loading");
   draw_gauge((int)(min(100, 100*collecting_time/need_collecting_time)), 9*height/36, "Collecting");
   draw_gauge((int)(min(100, 100*discharge_time/need_discharge_time)), 13*height/36, "Discharge");
   // 残り時間表示
@@ -254,7 +254,7 @@ void draw() {
   
   temp = remaining_time;
   temp -= (long)(min(need_washing_time, washing_time));
-  temp -= (long)(min(need_loading_time + 322, loading_time));
+  temp -= (long)(min(need_loading_time, loading_time));
   temp -= (long)(min(need_collecting_time, collecting_time));
   temp -= (long)(min(need_discharge_time, discharge_time));
   if(process_button_flag == true){
@@ -310,7 +310,7 @@ void Washing() {
 /*「LOADING」ボタンが押されたときに実行される関数 */
 void Loading() {
   if(process_toggle_flag == false && process_button_flag == false){
-    remaining_time = need_loading_time + 322;
+    remaining_time = need_loading_time;
     //Generating Threads
     Loading_exe = new Com_Loading();
     //Execution start
@@ -332,10 +332,10 @@ void Collecting() {
 /*「ALL PHASE」ボタンが押されたときに実行される関数 */
 void AllPhase() {
   if(process_toggle_flag == false && process_button_flag == false){
-    remaining_time = need_washing_time + (need_loading_time+322) + need_collecting_time;  // 全工程にかかる時間は、Phase1(Washing)＋Phase2(Loading)、Phase3(Collecting)の時間
+    remaining_time = need_washing_time + (need_loading_time) + need_collecting_time;  // 全工程にかかる時間は、Phase1(Washing)＋Phase2(Loading)、Phase3(Collecting)の時間
     start_washing_time = (long)millis()/1000;  // Phase1(Washing)の開始時間
     start_loading_time = (long)millis()/1000 + need_washing_time;  // Phase2(Loading)の開始時間
-    start_collecting_time = (long)millis()/1000 + need_washing_time + (need_loading_time+322);  // Phase3(Collecting)の開始時間
+    start_collecting_time = (long)millis()/1000 + need_washing_time + (need_loading_time);  // Phase3(Collecting)の開始時間
     //Generating Threads（全工程を実行するためのスレッドを生成）
     AllPhase_exe = new Com_AllPhase();
     //Execution start（全工程を実行）
@@ -345,9 +345,9 @@ void AllPhase() {
 /*「LOADING COLLECTING」ボタンが押されたときに実行される関数 */
 void LoadingCollecting() {
   if(process_toggle_flag == false && process_button_flag == false){
-    remaining_time = need_loading_time + 322 + need_collecting_time;
+    remaining_time = need_loading_time + need_collecting_time;
     start_loading_time = (long)millis()/1000;
-    start_collecting_time = (long)millis()/1000 + (need_loading_time+322);
+    start_collecting_time = (long)millis()/1000 + (need_loading_time);
     //Generating Threads
     LoadingCollecting_exe = new Com_LoadingCollecting();
     //Execution start
@@ -517,7 +517,7 @@ class Com_Loading extends Thread {
       }else{
           port.write("off_pump_12ch,0,0\n");     //Stop 12ch_Pump
           process_button_flag = false;
-          temp_Correct += need_loading_time + 322;
+          temp_Correct += need_loading_time;
           break;
       }
       
@@ -626,29 +626,27 @@ class Com_AllPhase extends Thread {
     loading_flag = false;
     collecting_flag = false;
     while(running == true){
-      if( ((millis()/1000)-start_allphase_time) < need_washing_time && washing_flag == false){
+      if( (millis()/1000) > start_washing_time && washing_flag == false){
         washing_flag = true;
         //Generating Threads
         Washing_exe = new Com_Washing();
         //Execution start
         Washing_exe.start();
-      }else if( need_washing_time <= ((millis()/1000)-start_allphase_time) && ((millis()/1000)-start_allphase_time) < (need_washing_time + need_loading_time + 322) && loading_flag == false){
+      }else if( (millis()/1000) > start_loading_time && loading_flag == false){
         Washing_exe.stopRunning();
         loading_flag = true;
         //Generating Threads
         Loading_exe = new Com_Loading();
         //Execution start
         Loading_exe.start();
-      }else if( (need_washing_time + need_loading_time + 322) <= ((millis()/1000)-start_allphase_time) 
-                && ((millis()/1000)-start_allphase_time) < (need_washing_time + need_loading_time + 322 + need_collecting_time) 
-                && collecting_flag == false){
+      }else if( (millis()/1000) > start_collecting_time && collecting_flag == false){
         Loading_exe.stopRunning();
         collecting_flag = true;
         //Generating Threads
         Collecting_exe = new Com_Collecting();
         //Execution start
         Collecting_exe.start();
-      }else if(((millis()/1000)-start_allphase_time) >= (need_washing_time + need_loading_time + 322 + need_collecting_time)){
+      }else if(((millis()/1000)-start_allphase_time) >= (need_washing_time + need_loading_time + need_collecting_time)){
         Collecting_exe.stopRunning();
         process_button_flag = false;
         break;
@@ -675,14 +673,14 @@ class Com_LoadingCollecting extends Thread {
     
     start_loadingcollecting_time = (long)millis()/1000;
     while(running == true){
-      if(((millis()/1000)-start_loadingcollecting_time) < (need_loading_time + 322) && loading_flag == false){
+      if(((millis()/1000)-start_loadingcollecting_time) < (need_loading_time) && loading_flag == false){
         loading_flag = true;
         //Generating Threads
         Loading_exe = new Com_Loading();
         //Execution start
         Loading_exe.start();
-      }else if( (need_loading_time + 322) <= ((millis()/1000)-start_loadingcollecting_time) 
-                && ((millis()/1000)-start_loadingcollecting_time) < (need_loading_time + 322 + need_collecting_time) 
+      }else if( (need_loading_time) <= ((millis()/1000)-start_loadingcollecting_time) 
+                && ((millis()/1000)-start_loadingcollecting_time) < (need_loading_time + need_collecting_time) 
                 && collecting_flag == false){
         Loading_exe.stopRunning();
         collecting_flag = true;
@@ -690,7 +688,7 @@ class Com_LoadingCollecting extends Thread {
         Collecting_exe = new Com_Collecting();
         //Execution start
         Collecting_exe.start();
-      }else if(((millis()/1000)-start_loadingcollecting_time) > (need_loading_time + 322 + need_collecting_time)){
+      }else if(((millis()/1000)-start_loadingcollecting_time) > (need_loading_time+ need_collecting_time)){
         Collecting_exe.stopRunning();
         process_button_flag = false;
         break; 
