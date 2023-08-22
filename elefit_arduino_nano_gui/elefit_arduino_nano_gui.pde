@@ -626,27 +626,27 @@ class Com_AllPhase extends Thread {
     loading_flag = false;
     collecting_flag = false;
     while(running == true){
-      if( (millis()/1000) > start_washing_time && washing_flag == false){
+      if( (millis()/1000) - start_allphase_time > start_washing_time  && washing_flag == false){
         washing_flag = true;
         //Generating Threads
         Washing_exe = new Com_Washing();
         //Execution start
         Washing_exe.start();
-      }else if( (millis()/1000) > start_loading_time && loading_flag == false){
+      }else if( (millis()/1000) - start_allphase_time > start_loading_time  && loading_flag == false){
         Washing_exe.stopRunning();
         loading_flag = true;
         //Generating Threads
         Loading_exe = new Com_Loading();
         //Execution start
         Loading_exe.start();
-      }else if( (millis()/1000) > start_collecting_time && collecting_flag == false){
+      }else if( (millis()/1000) - start_allphase_time > start_collecting_time  && collecting_flag == false){
         Loading_exe.stopRunning();
         collecting_flag = true;
         //Generating Threads
         Collecting_exe = new Com_Collecting();
         //Execution start
         Collecting_exe.start();
-      }else if(((millis()/1000)-start_allphase_time) >= (need_washing_time + need_loading_time + need_collecting_time)){
+      }else if(((millis()/1000) - start_allphase_time ) >= (need_washing_time + need_loading_time + need_collecting_time)){
         Collecting_exe.stopRunning();
         process_button_flag = false;
         break;
