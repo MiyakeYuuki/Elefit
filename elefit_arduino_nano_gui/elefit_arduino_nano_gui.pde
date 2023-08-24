@@ -3,7 +3,7 @@ import processing.serial.*; //Package for Serial communication between an Arduin
 
 long temp_Correct = 0;
 final long need_washing_time = 693+5;
-int need_loading_time = 817;
+final long need_loading_time = 817;
 final long need_collecting_time = 419;
 final long need_discharge_time = 300;
 long start_washing_time = 10000000;
@@ -332,10 +332,14 @@ void Collecting() {
 /*「ALL PHASE」ボタンが押されたときに実行される関数 */
 void AllPhase() {
   if(process_toggle_flag == false && process_button_flag == false){
-    remaining_time = need_washing_time + (need_loading_time) + need_collecting_time;  // 全工程にかかる時間は、Phase1(Washing)＋Phase2(Loading)、Phase3(Collecting)の時間
+    remaining_time = need_washing_time + need_loading_time + need_collecting_time;  // 全工程にかかる時間は、Phase1(Washing)＋Phase2(Loading)、Phase3(Collecting)の時間
     start_washing_time = (long)millis()/1000;  // Phase1(Washing)の開始時間
     start_loading_time = (long)millis()/1000 + need_washing_time;  // Phase2(Loading)の開始時間
-    start_collecting_time = (long)millis()/1000 + need_washing_time + (need_loading_time);  // Phase3(Collecting)の開始時間
+    start_collecting_time = (long)millis()/1000 + need_washing_time + need_loading_time;  // Phase3(Collecting)の開始時間
+    println("start_washing_time="+start_washing_time);
+    println("start_loading_time="+start_loading_time);
+    println("start_collecting_time="+start_collecting_time);
+    println("need_loading_time="+need_loading_time);
     //Generating Threads（全工程を実行するためのスレッドを生成）
     AllPhase_exe = new Com_AllPhase();
     //Execution start（全工程を実行）
@@ -347,7 +351,7 @@ void LoadingCollecting() {
   if(process_toggle_flag == false && process_button_flag == false){
     remaining_time = need_loading_time + need_collecting_time;
     start_loading_time = (long)millis()/1000;
-    start_collecting_time = (long)millis()/1000 + (need_loading_time);
+    start_collecting_time = (long)millis()/1000 + need_loading_time;
     //Generating Threads
     LoadingCollecting_exe = new Com_LoadingCollecting();
     //Execution start
@@ -627,6 +631,10 @@ class Com_AllPhase extends Thread {
     collecting_flag = false;
     while(running == true){
       if( (millis()/1000) - start_allphase_time > start_washing_time  && washing_flag == false){
+        println("Start Washing");
+        print("Time=");
+        print((millis()/1000) - start_allphase_time);
+        print("[sec]\n");
         washing_flag = true;
         //Generating Threads
         Washing_exe = new Com_Washing();
@@ -634,6 +642,10 @@ class Com_AllPhase extends Thread {
         Washing_exe.start();
       }else if( (millis()/1000) - start_allphase_time > start_loading_time  && loading_flag == false){
         Washing_exe.stopRunning();
+        println("Start Loading");
+        print("Time=");
+        print((millis()/1000) - start_allphase_time);
+        print("[sec]\n");
         loading_flag = true;
         //Generating Threads
         Loading_exe = new Com_Loading();
@@ -641,6 +653,10 @@ class Com_AllPhase extends Thread {
         Loading_exe.start();
       }else if( (millis()/1000) - start_allphase_time > start_collecting_time  && collecting_flag == false){
         Loading_exe.stopRunning();
+        println("Start Collecting");
+        print("Time=");
+        print((millis()/1000) - start_allphase_time);
+        print("[sec]\n");
         collecting_flag = true;
         //Generating Threads
         Collecting_exe = new Com_Collecting();
