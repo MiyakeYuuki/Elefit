@@ -152,20 +152,20 @@ void setup() {
     .setColorCaptionLabel(color(0)) 
     .setFont(cf1);
   
-  cp5.addSlider("need_loading_time")
-    .setPosition(11*button_width/3, height-20*button_height/4)
-    .setSize(2*button_width, button_height/2)
-    .setSliderMode(Slider.FLEXIBLE)
-    .setRange(1, 330)
-    .setValue(180) 
-    .setFont(cf1)
-    .setCaptionLabel("Loading Time[sec]") ;
+  //cp5.addSlider("need_loading_time")
+  //  .setPosition(11*button_width/3, height-20*button_height/4)
+  //  .setSize(2*button_width, button_height/2)
+  //  .setSliderMode(Slider.FLEXIBLE)
+  //  .setRange(1, 330)
+  //  .setValue(180) 
+  //  .setFont(cf1)
+  //  .setCaptionLabel("Loading Time[sec]") ;
     
-  cp5.getController("need_loading_time")
-    .getCaptionLabel()
-    .setVisible(false) 
-    .toUpperCase(false)
-    .align(ControlP5.LEFT, ControlP5.BOTTOM_OUTSIDE) ;
+  //cp5.getController("need_loading_time")
+  //  .getCaptionLabel()
+  //  .setVisible(true) 
+  //  .toUpperCase(false)
+  //  .align(ControlP5.LEFT, ControlP5.BOTTOM_OUTSIDE) ;
   
   cp5.addToggle("pump_12ch")
     .setPosition(button_width/6, 5 * button_height)
