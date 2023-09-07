@@ -4,7 +4,7 @@ import processing.serial.*; //Package for Serial communication between an Arduin
 long temp_Correct = 0;
 final long need_washing_time = 693+5;
 final long need_loading_time = 817;
-final long need_collecting_time = 419;
+final long need_collecting_time = 260;
 final long need_discharge_time = 300;
 long start_washing_time = 10000000;
 long start_loading_time = 10000000;
