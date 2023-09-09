@@ -42,6 +42,7 @@ void setup() {
   //size(1120, 630);  // W:H = 16:9
   /*Display settings*/
   size(1600, 900);  // W:H = 16:9
+  
   int font_size = width/56;
   cp5 = new ControlP5(this);
   PFont myFont = createFont("Arial",font_size,true);
@@ -201,6 +202,16 @@ void setup() {
 
 /* Function for drawing gauge */
 void draw_gauge(int percentage, float y, String name) {
+  
+  // 画面背景のグラデーション作成
+  int j;
+  for(j=0;j<width;j++){
+    stroke(0,100,j*255/width,10);  //引数は(R,G,B,不透明度)の順番
+    line(j*1.5,j,j,height/2.1);
+  
+  }
+  
+  
   int x = width/5;
   int font_size = width/56;
   
@@ -210,7 +221,7 @@ void draw_gauge(int percentage, float y, String name) {
   //ゲージの下地描画
   fill(255);              //色指定
   //strokeWeight(1);  //ゲージ下地の枠線太さ
-  rect(x, y, gauge_width, gauge_height,10);        //ゲージの下地描画
+  rect(x, y, gauge_width, gauge_height,20);        //ゲージの下地描画
   
   fill(0);            //色指定
   //横軸表示
@@ -226,7 +237,7 @@ void draw_gauge(int percentage, float y, String name) {
   noStroke(); //枠線なし
 
   //strokeWeight(0);  // 横棒の枠線太さ
-  rect(x, y, percentage*gauge_width/100, gauge_height,10); //横棒描画
+  rect(x, y, percentage*gauge_width/100, gauge_height,20); //横棒描画
   fill(color(0, 128, 0));        //色指定   
   //パーセンテージ表示  
   textSize(1.5*font_size);                  //テキストサイズ
@@ -235,7 +246,13 @@ void draw_gauge(int percentage, float y, String name) {
   //%表示
   textSize(font_size);                  //テキストサイズ
   textAlign(LEFT);               //左揃え
-  text("%", 3*x/2+gauge_width, y+gauge_height);         
+  text("%", 3*x/2+gauge_width, y+gauge_height);     
+  
+    // バージョン表示
+  fill(color(0));
+  textSize(0.6*font_size);     
+  text("Elefit ver.3.0 ", 9*width/10, 13.5*height/14);
+
 }
 
 // Function to draw all gauge, control pump
