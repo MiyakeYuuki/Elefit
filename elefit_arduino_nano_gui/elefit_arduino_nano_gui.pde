@@ -209,7 +209,8 @@ void draw_gauge(int percentage, float y, String name) {
   
   //ゲージの下地描画
   fill(255);              //色指定
-  rect(x, y, gauge_width, gauge_height);        //ゲージの下地描画
+  //strokeWeight(1);  //ゲージ下地の枠線太さ
+  rect(x, y, gauge_width, gauge_height,10);        //ゲージの下地描画
   
   fill(0);            //色指定
   //横軸表示
@@ -222,8 +223,11 @@ void draw_gauge(int percentage, float y, String name) {
   text(100, x+gauge_width, y+3*gauge_height/2);   //100
   //ゲージ表示
   fill(0,128,0);              //色指定 
-  rect(x, y, percentage*gauge_width/100, gauge_height); //横棒描画
-  fill(color(0, 128, 0));        //色指定         
+  noStroke(); //枠線なし
+
+  //strokeWeight(0);  // 横棒の枠線太さ
+  rect(x, y, percentage*gauge_width/100, gauge_height,10); //横棒描画
+  fill(color(0, 128, 0));        //色指定   
   //パーセンテージ表示  
   textSize(1.5*font_size);                  //テキストサイズ
   textAlign(RIGHT);              //右揃え
