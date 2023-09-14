@@ -202,16 +202,7 @@ void setup() {
 
 /* Function for drawing gauge */
 void draw_gauge(int percentage, float y, String name) {
-  
-  // 画面背景のグラデーション作成
-  int j;
-  for(j=0;j<width;j++){
-    stroke(0,100,j*255/width,10);  //引数は(R,G,B,不透明度)の順番
-    line(j*1.5,j,j,height/2.1);
-  
-  }
-  
-  
+   
   int x = width/5;
   int font_size = width/56;
   
@@ -258,7 +249,16 @@ void draw_gauge(int percentage, float y, String name) {
 // Function to draw all gauge, control pump
 void draw() {    
   int font_size = width/56;
-  background(200);
+  
+  background(200); // 背景をグレーに設定
+  // 画面背景のグラデーション作成
+  int j;
+  for(j=0;j<width;j++){
+    stroke(0,100,j*255/width,50);  //引数は(R,G,B,不透明度)の順番
+    line(j*1.5,j,j,height/2.1);
+  
+  }
+  
   long temp;
   long washing_time = (long)max(0, (millis()/1000)-start_washing_time);
   long loading_time = (long)max(0, (millis()/1000)-start_loading_time);
