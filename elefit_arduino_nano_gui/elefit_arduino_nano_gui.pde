@@ -276,6 +276,10 @@ void draw() {
   temp -= (long)(min(need_loading_time, loading_time));
   temp -= (long)(min(need_collecting_time, collecting_time));
   temp -= (long)(min(need_discharge_time, discharge_time));
+  println("washing_time/need_washing_time="+washing_time+"/"+need_washing_time);
+  println("loading_time/need_loading_time="+loading_time+"/"+need_loading_time);
+  println("collecting_time/need_collecting_time="+collecting_time+"/"+need_collecting_time);
+
   if (process_button_flag == true) {
     //temp += temp_Correct;
   } else {
