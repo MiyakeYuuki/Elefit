@@ -276,9 +276,9 @@ void draw() {
   temp -= (long)(min(need_loading_time, loading_time));
   temp -= (long)(min(need_collecting_time, collecting_time));
   temp -= (long)(min(need_discharge_time, discharge_time));
-  println("washing_time/need_washing_time="+washing_time+"/"+need_washing_time);
-  println("loading_time/need_loading_time="+loading_time+"/"+need_loading_time);
-  println("collecting_time/need_collecting_time="+collecting_time+"/"+need_collecting_time);
+  //println("washing_time/need_washing_time="+washing_time+"/"+need_washing_time);
+  //println("loading_time/need_loading_time="+loading_time+"/"+need_loading_time);
+  //println("collecting_time/need_collecting_time="+collecting_time+"/"+need_collecting_time);
 
   if (process_button_flag == true) {
     //temp += temp_Correct;
@@ -644,6 +644,8 @@ class Com_AllPhase extends Thread {
     boolean collecting_flag = false;
 
     start_allphase_time = (long)millis()/1000;
+    println("start_allphase_time="+start_allphase_time);
+    
     washing_flag = false;
     loading_flag = false;
     collecting_flag = false;
@@ -680,7 +682,8 @@ class Com_AllPhase extends Thread {
         Collecting_exe = new Com_Collecting();
         //Execution start
         Collecting_exe.start();
-      } else if (((millis()/1000))>= (need_washing_time + need_loading_time + need_collecting_time)) {
+      } else if (((millis()/1000)-start_allphase_time)>= (need_washing_time + need_loading_time + need_collecting_time)) {
+        println("All Phase completed.");
         Collecting_exe.stopRunning();
         process_button_flag = false;
         break;
