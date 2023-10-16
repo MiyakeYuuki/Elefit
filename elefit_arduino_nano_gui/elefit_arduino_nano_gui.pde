@@ -113,9 +113,12 @@ void setup() {
     .setColorActive(color(0, 40))
     .setColorBackground(color(181, 255, 20))
     .setColorForeground(color(121, 200, 20))
-    .setCaptionLabel("Loading\nCollecting")
+    .setCaptionLabel("   Loading\n          ↓   \nCollecting")
+    .align(29*button_width/6,height-5*button_height/2,ControlP5.CENTER,ControlP5.UP)  //  8.5*width/10,11*height/14
+    //.setPadding(1,0)
     .setColorCaptionLabel(color(0))
     .setFont(cf1) ;
+    
 
   cp5.addButton("Front")
     .setPosition(button_width/6, height-5*button_height/4)
@@ -266,6 +269,7 @@ void draw() {
   draw_gauge((int)(min(100, 100*loading_time/(need_loading_time))), 5*height/36, "Loading");
   draw_gauge((int)(min(100, 100*collecting_time/need_collecting_time)), 9*height/36, "Collecting");
   draw_gauge((int)(min(100, 100*discharge_time/need_discharge_time)), 13*height/36, "Discharge");
+  
   // 残り時間表示
   fill(color(0));
   textSize(1.5*font_size);                  //テキストサイズ
@@ -293,7 +297,9 @@ void draw() {
   text(seconds, 11*width/16 + width/10, 14*height/20);
   text("sec", 11*width/16 + width/7.5, 14*height/20);
 
-
+  //fill(color(0));
+  //textSize(font_size);
+  //text("LOADING\nCOLLECTING", 8.5*width/10, 11*height/14);
 
   if (process_toggle_flag == false) {
     process_toggle_flag = true;
