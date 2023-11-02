@@ -10,7 +10,7 @@ This is a program for arduino.
 This file contains arduino sketch and GUI program.
 
 # Installation
-1. Download and install software 「[Processing](https://processing.org/)」 and 「[Arduino IDE(https://www.arduino.cc/en/software)」.
+1. Download and install software 「[Processing](https://processing.org/)」 and 「[Arduino IDE(https://www.arduino.cc/en/software)」. [Note:Processing version 4.0b7 is Recommended]
 2. Open Arduino IDE.
 2. Connect your PC and Elefit using USB (Micro-B) cable.
 3. Select board and COM port. (Board name: Arduino nano)
