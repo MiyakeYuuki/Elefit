@@ -72,7 +72,7 @@ void loop() {
     // ELEMENTS_NUM個の文字列の間にカンマを付けて送る
     // 送信側の改行設定は「LFのみ」にすること
     // シリアル通信で1行（改行コードまで）読み込む
-    line = Serial.readStringUntil('\n');
+    line = Serial.readStringUntil(';');
 
     beginIndex = 0;
     for (received_elements_num = 0; received_elements_num < ELEMENTS_NUM; received_elements_num++) {
