@@ -29,7 +29,7 @@ static String elements[ELEMENTS_NUM];
 static int received_elements_num = 0; /**< 受信済み文字列の数 */
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
   /***** GPIO pin setup *****/
   pinMode(PWM_PORT_M1_1, OUTPUT);     //DPE-100-7P-Y1 (A)
   pinMode(PWM_PORT_M2_1, OUTPUT);     //DPE-100-7P-Y1 (B)
@@ -72,7 +72,7 @@ void loop() {
     // ELEMENTS_NUM個の文字列の間にカンマを付けて送る
     // 送信側の改行設定は「LFのみ」にすること
     // シリアル通信で1行（改行コードまで）読み込む
-    line = Serial.readStringUntil(';');
+    line = Serial.readStringUntil('\n');
 
     beginIndex = 0;
     for (received_elements_num = 0; received_elements_num < ELEMENTS_NUM; received_elements_num++) {
