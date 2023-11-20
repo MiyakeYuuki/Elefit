@@ -33,29 +33,36 @@ void setup() {
 void loop() {
   if (Serial.available()) {
     String line;              // 受信文字列
+    String not_line;              // 受信文字列
     unsigned int beginIndex;  // 要素の開始位置
 
     // シリアルモニタやProcessingから"AB,C,DEF,12,3,45,A1,2B,-1,+127"のように
     // ELEMENTS_NUM個の文字列の間にカンマを付けて送る
     // 送信側の改行設定は「LFのみ」にすること
     // シリアル通信で1行（改行コードまで）読み込む
-    line = Serial.readStringUntil('\n');
-    if (line == "a") {
-      digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
-      delay(1000);                       // wait for a second
-      digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
-      delay(1000);
-      digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
-      delay(1000);                       // wait for a second
-    } else {
-      digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
-      delay(500);                       // wait for a second
-      digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
-      delay(500);
-      digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
-      delay(500);
-      digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
-      delay(500);
-    }
+//    line = Serial.readStringUntil('\n');
+//    not_line=Serial.readString();
+//    Serial.print(not_line);
+    
+    Serial.write(Serial.read());
+    Serial.println();
+    
+//    if (line == "a") {
+//      digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
+//      delay(1000);                       // wait for a second
+//      digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
+//      delay(1000);
+//      digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
+//      delay(1000);                       // wait for a second
+//    } else {
+//      digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
+//      delay(500);                       // wait for a second
+//      digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
+//      delay(500);
+//      digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
+//      delay(500);
+//      digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
+//      delay(500);
+//    }
   }
 }
