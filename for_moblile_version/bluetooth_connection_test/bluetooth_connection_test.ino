@@ -40,12 +40,21 @@ void loop() {
     // ELEMENTS_NUM個の文字列の間にカンマを付けて送る
     // 送信側の改行設定は「LFのみ」にすること
     // シリアル通信で1行（改行コードまで）読み込む
-//    line = Serial.readStringUntil('\n');
+    line = Serial.readStringUntil('\n');
 //    not_line=Serial.readString();
 //    Serial.print(not_line);
     
-    Serial.write(Serial.read());
-    Serial.println();
+//    Serial.write(Serial.read());
+//    Serial.println();
+    
+    if (line == "a") {
+      digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
+      delay(1000);                       // wait for a second
+      digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
+      delay(1000);
+      digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
+      delay(1000);                       // wait for a second
+    }
     
 //    if (line == "a") {
 //      digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)

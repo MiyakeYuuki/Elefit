@@ -64,7 +64,9 @@ void setup() {
 void(*resetFunc)(void) = 0; // Arduinoをリセットボタンでなく、プログラムからリセットするための関数
 
 void loop() {
+  
   if (Serial.available()) {
+//    Serial.flush();
     String line;              // 受信文字列
     unsigned int beginIndex;  // 要素の開始位置
 
@@ -73,7 +75,6 @@ void loop() {
     // 送信側の改行設定は「LFのみ」にすること
     // シリアル通信で1行（改行コードまで）読み込む
     line = Serial.readStringUntil('\n');
-
     beginIndex = 0;
     for (received_elements_num = 0; received_elements_num < ELEMENTS_NUM; received_elements_num++) {
         // 最後の要素ではない場合
@@ -143,6 +144,8 @@ void loop() {
       resetFunc();
     }
     elements[0] == "\0";    // 文字列の初期化
+    Serial.end();
+    Serial.begin(115200);
   }
 }
 /* ステッピングモータを駆動してカラムを前方に動かす関数 */
