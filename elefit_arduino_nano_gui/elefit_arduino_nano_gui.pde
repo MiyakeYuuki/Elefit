@@ -55,7 +55,7 @@ void setup() {
   for (int i=0; i<num; i++) {
     print(comPort[i]+"     ");
     try {
-      port = new Serial(this, comPort[i], 9600);
+      port = new Serial(this, comPort[i], 115200);
       println("O.K");
     }
     catch(Exception e) {
