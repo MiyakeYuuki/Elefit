@@ -46,7 +46,7 @@ void read_data(){
         line = Serial.readStringUntil('\n');
 
         // reset_arduinoが来たら、ほかの処理中でも処理を中断
-        if((running_flag == true) && (line == "reset_arduino,0,0\n")){
+        if(line == "reset_arduino,0,0\n"){
           exit(0);  // 強制終了
           } 
 
@@ -76,10 +76,17 @@ void read_data(){
                 elements[received_elements_num] = line.substring(beginIndex);
             }
         }
-//      elements[0] == "\0";    // 文字列の初期化
-      if(running_flag){ // 実行中(running_flag==ture)なら他の処理を実行しない
-          elements[0]="running_another_process";
+
+        if(elements[0] == "reset_arduino"){
+          Serial.println(elements[0]);
+          delay(100);
+          exit(0);  // 強制終了
+//          resetFunc();          
           }
+//      elements[0] == "\0";    // 文字列の初期化
+//      if(running_flag){ // 実行中(running_flag==ture)なら他の処理を実行しない
+//          elements[0]="running_another_process";
+//          }
       Serial.end();
       Serial.begin(115200);
   }
@@ -126,7 +133,8 @@ void setup() {
 void(*resetFunc)(void) = 0; // Arduinoをリセットボタンでなく、プログラムからリセットするための関数
 
 void loop() {
-  
+
+  delay(50);
 //  if (Serial.available()) {
 //    String line;              // 受信文字列
 //    unsigned int beginIndex;  // 要素の開始位置
@@ -161,29 +169,29 @@ void loop() {
 //        }
 //    }
     
-    if(elements[0] == "step_front"){ // ステッピングモータを駆動してカラムを前方に動かす
+    if(elements[0] == "step_front" && running_flag == false){ // ステッピングモータを駆動してカラムを前方に動かす
       Serial.println(elements[0]);
       step_front(elements[1].toInt());
     }
-    else if(elements[0] == "step_back"){  // ステッピングモータを駆動してカラムを後方に動かす
+    else if(elements[0] == "step_back" && running_flag == false){  // ステッピングモータを駆動してカラムを後方に動かす
       Serial.println(elements[0]);
       step_back(elements[1].toInt());   
     }
-    else if(elements[0] == "on_pump_12ch"){  // 6chポンプ×2を駆動
+    else if(elements[0] == "on_pump_12ch" && running_flag == false){  // 6chポンプ×2を駆動
       Serial.println(elements[0]);
       Serial.println(elements[1]);
       Serial.println(elements[2]);
       on_pump_12ch(elements[1].toInt(),elements[2].toInt()); 
     }
-    else if(elements[0] == "pwm_pump_12ch"){  // 6ch×2のポンプをわずかに正転させ、停止する
+    else if(elements[0] == "pwm_pump_12ch" && running_flag == false){  // 6ch×2のポンプをわずかに正転させ、停止する
       Serial.println(elements[0]);
       pwm_pump_12ch(); 
     }
-    else if(elements[0] == "off_pump_12ch"){  // 6chポンプ×2を停止
+    else if(elements[0] == "off_pump_12ch" && running_flag == false){  // 6chポンプ×2を停止
       Serial.println(elements[0]);
       off_pump_12ch(); 
     }
-    else if(elements[0] == "on_pump_dba"){  // ダイヤフラムポンプを駆動
+    else if(elements[0] == "on_pump_dba" && running_flag == false){  // ダイヤフラムポンプを駆動
       Serial.println(elements[0]);
       if(elements[1].toInt() == 1){
         digitalWrite(PWM_PORT_M1_1, HIGH);
@@ -195,18 +203,21 @@ void loop() {
         digitalWrite(PWM_PORT_M3_1, HIGH);
       }
     }
-    else if(elements[0] == "off_pump_dba"){ // ダイヤフラムポンプを停止
+    else if(elements[0] == "off_pump_dba" && running_flag == false){ // ダイヤフラムポンプを停止
       Serial.println(elements[0]);
       digitalWrite(PWM_PORT_M1_1, LOW);
       digitalWrite(PWM_PORT_M2_1, LOW);
       digitalWrite(PWM_PORT_M3_1, LOW);
-    }else if(elements[0] == "reset_arduino"){ // Ardrinoをリセットする（動作はリセットボタンを押したときと同じ）
-      Serial.println(elements[0]);
-      delay(100);
-      resetFunc();
-    }else if(elements[0] == "running_another_process"){
-      // 他の処理を実行中は何もしない
-      }
+    }
+//    else if(elements[0] == "reset_arduino"){ // Ardrinoをリセットする（動作はリセットボタンを押したときと同じ）
+//      Serial.println(elements[0]);
+//      delay(100);
+//      resetFunc();
+//    }
+//    else if(elements[0] == "running_another_process"){
+//      Serial.println(elements[0]);
+//      // 他の処理を実行中は何もしない
+//      }
 //    elements[0] == "\0";    // 文字列の初期化
 //    Serial.end();
 //    Serial.begin(115200);
@@ -235,6 +246,7 @@ int step_front(int step){
 /* ステッピングモータを駆動してカラムを後方に動かす関数 */
 int step_back(int step){
   running_flag = true; // 動作の実行フラグを立てる（tureの間は他の処理を実行しない）
+  delay(5000);
   digitalWrite(STEP_PORT_2, HIGH);
   digitalWrite(STEP_PORT_4, HIGH);
 
