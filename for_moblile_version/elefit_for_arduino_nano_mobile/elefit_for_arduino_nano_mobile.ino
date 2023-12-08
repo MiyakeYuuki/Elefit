@@ -32,6 +32,8 @@ static int received_elements_num = 0; /**< 受信済み文字列の数 */
 
 boolean running_flag = false;   // 処理の実行管理用フラグ
 
+void(*resetFunc)(void) = 0; // Arduinoをリセットボタンでなく、プログラムからリセットするための関数
+
 // シリアル通信でスマホからの命令を読み込む関数
 void read_data(){
     if (Serial.available()) {
@@ -44,13 +46,6 @@ void read_data(){
         // 送信側の改行設定は「LFのみ」にすること
         // シリアル通信で1行（改行コードまで）読み込む
         line = Serial.readStringUntil('\n');
-
-        // reset_arduinoが来たら、ほかの処理中でも処理を中断
-        if(line == "reset_arduino,0,0\n"){
-          exit(0);  // 強制終了
-          } 
-
-
         
         beginIndex = 0;
         for (received_elements_num = 0; received_elements_num < ELEMENTS_NUM; received_elements_num++) {
@@ -79,14 +74,13 @@ void read_data(){
 
         if(elements[0] == "reset_arduino"){
           Serial.println(elements[0]);
-          delay(100);
-          exit(0);  // 強制終了
-//          resetFunc();          
+          delay(500);
+          resetFunc();          
           }
 //      elements[0] == "\0";    // 文字列の初期化
-//      if(running_flag){ // 実行中(running_flag==ture)なら他の処理を実行しない
-//          elements[0]="running_another_process";
-//          }
+      if(running_flag){ // 実行中(running_flag==ture)なら他の処理を実行しない
+          elements[0]="running_another_process";
+          }
       Serial.end();
       Serial.begin(115200);
   }
@@ -130,7 +124,7 @@ void setup() {
 }
 
 
-void(*resetFunc)(void) = 0; // Arduinoをリセットボタンでなく、プログラムからリセットするための関数
+
 
 void loop() {
 
