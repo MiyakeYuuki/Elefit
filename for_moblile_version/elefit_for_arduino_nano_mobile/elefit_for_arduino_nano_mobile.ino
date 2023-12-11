@@ -161,20 +161,10 @@ void loop() {
       off_pump_12ch();
     }
     else if (elements[0] == "on_pump_dba") { // ダイヤフラムポンプを駆動
-      if (elements[1].toInt() == 1) {
-        digitalWrite(PWM_PORT_M1_1, HIGH);
-      }
-      else if (elements[1].toInt() == 2) {
-        digitalWrite(PWM_PORT_M2_1, HIGH);
-      }
-      else if (elements[1].toInt() == 3) {
-        digitalWrite(PWM_PORT_M3_1, HIGH);
-      }
+      on_pump_dba(elements[1].toInt());
     }
     else if (elements[0] == "off_pump_dba" && running_flag == false) { // ダイヤフラムポンプを停止
-      digitalWrite(PWM_PORT_M1_1, LOW);
-      digitalWrite(PWM_PORT_M2_1, LOW);
-      digitalWrite(PWM_PORT_M3_1, LOW);
+      off_pump_dba();
     }
     rx_sig_count_prev = rx_sig_count; // 信号を1回受信したら更新（これで次の命令を受信するまで動作を実行しない）
     Serial.print("rx_sig_count = ");
@@ -186,7 +176,7 @@ void loop() {
   }
 }
 /* ステッピングモータを駆動してカラムを前方に動かす関数 */
-int step_front(int step) {
+void step_front(int step) {
   digitalWrite(STEP_PORT_2, HIGH);
   digitalWrite(STEP_PORT_4, HIGH);
 
@@ -204,7 +194,7 @@ int step_front(int step) {
   digitalWrite(STEP_PORT_4, LOW);
 }
 /* ステッピングモータを駆動してカラムを後方に動かす関数 */
-int step_back(int step) {
+void step_back(int step) {
   digitalWrite(STEP_PORT_2, HIGH);
   digitalWrite(STEP_PORT_4, HIGH);
 
@@ -225,8 +215,27 @@ int step_back(int step) {
   digitalWrite(STEP_PORT_2, LOW);
   digitalWrite(STEP_PORT_4, LOW);
 }
+
+void on_pump_dba(int pump_id) {
+  if (pump_id == 1) {
+    digitalWrite(PWM_PORT_M1_1, HIGH);
+  }
+  else if (pump_id == 2) {
+    digitalWrite(PWM_PORT_M2_1, HIGH);
+  }
+  else if (pump_id == 3) {
+    digitalWrite(PWM_PORT_M3_1, HIGH);
+  }
+}
+
+void off_pump_dba() {
+  digitalWrite(PWM_PORT_M1_1, LOW);
+  digitalWrite(PWM_PORT_M2_1, LOW);
+  digitalWrite(PWM_PORT_M3_1, LOW);
+}
+
 /* 6ch×2のポンプ正転・逆転する関数 */
-int on_pump_12ch(int speed, bool rev) {
+void on_pump_12ch(int speed, bool rev) {
   if (rev == 0) {
     analogWrite(PWM_PORT_M4_1, speed1 * 2.55);
     analogWrite(PWM_PORT_M5_2, speed2 * 2.55);
@@ -250,4 +259,13 @@ void pwm_pump_12ch() {
   delay(385);
   off_pump_12ch();
   delay(625);
+}
+
+/* 6ch×2のポンプ停止する関数 */
+void washing() {
+  step_front(50);
+  step_back(200);
+  on_pump_dba(1);
+  delay(18000);
+  off_pump_dba();
 }
