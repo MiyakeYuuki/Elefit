@@ -32,6 +32,7 @@ static int received_elements_num = 0; /**< 受信済み文字列の数 */
 int rx_sig_count_prev = 0 ; /*信号を受信するとカウントアップ*/
 int rx_sig_count = 0 ; /*信号を受信するとカウントアップ*/
 
+unsigned long start_time;  // pwm_pump処理の実行開始時刻
 boolean running_flag = false;   // 処理の実行管理用フラグ
 
 void(*resetFunc)(void) = 0; // Arduinoをリセットボタンでなく、プログラムからリセットするための関数
@@ -154,18 +155,27 @@ void loop() {
     else if (elements[0] == "on_pump_12ch") { // 6chポンプ×2を駆動
       on_pump_12ch(elements[1].toInt(), elements[2].toInt());
     }
-    else if (elements[0] == "pwm_pump_12ch") { // 6ch×2のポンプをわずかに正転させ、停止する
-      pwm_pump_12ch();
-    }
+//    else if (elements[0] == "pwm_pump_12ch") { // 6ch×2のポンプをわずかに正転させ、停止する
+//      pwm_pump_12ch();
+//    }
     else if (elements[0] == "off_pump_12ch") { // 6chポンプ×2を停止
       off_pump_12ch();
     }
     else if (elements[0] == "on_pump_dba") { // ダイヤフラムポンプを駆動
       on_pump_dba(elements[1].toInt());
     }
-    else if (elements[0] == "off_pump_dba" && running_flag == false) { // ダイヤフラムポンプを停止
+    else if (elements[0] == "off_pump_dba") { // ダイヤフラムポンプを停止
       off_pump_dba();
     }
+    else if (elements[0] == "washing") { // Washingの処理を実行
+      washing();
+    }
+
+
+
+
+
+    
     rx_sig_count_prev = rx_sig_count; // 信号を1回受信したら更新（これで次の命令を受信するまで動作を実行しない）
     Serial.print("rx_sig_count = ");
     Serial.print(rx_sig_count);
@@ -254,18 +264,35 @@ void off_pump_12ch() {
   digitalWrite(PWM_PORT_M5_2, LOW);
 }
 /* 6ch×2のポンプをわずかに正転させ、停止する関数 */
-void pwm_pump_12ch() {
+void pwm_pump_12ch(unsigned long running_time) {
+  unsigned long curr; // 現在時刻の保存用変数  
+  // 指定した実行時間（running_time）の間処理を繰り返す
+  do {
+  curr = millis();
   on_pump_12ch(80, 0);
   delay(385);
   off_pump_12ch();
   delay(625);
+  }while(curr-start_time<=running_time);
 }
 
-/* 6ch×2のポンプ停止する関数 */
+/* Phase1（Washing） */
 void washing() {
   step_front(50);
   step_back(200);
+  /* 1-1 */
   on_pump_dba(1);
-  delay(18000);
+  delay(18000); // Wait 18 sec
   off_pump_dba();
+  /* 1-2 */
+  on_pump_12ch(100,0);
+  delay(45000); // Wait 45 sec
+  off_pump_12ch();
+  /* 1-3 */
+  start_time = millis(); // pwm_pump_12chの実行開始時刻を保存
+  pwm_pump_12ch(60000); // Wait 60 sec (test = 6 sec)
+  /* 1-4 */
+  on_pump_12ch(100,0);
+  delay(30000); // Wait 30 sec
+  off_pump_12ch();
 }

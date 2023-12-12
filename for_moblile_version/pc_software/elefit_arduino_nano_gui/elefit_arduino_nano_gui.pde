@@ -327,13 +327,14 @@ void draw() {
 
 /*「WASHING」ボタンが押されたときに実行される関数 */
 void Washing() {
-  if (process_toggle_flag == false && process_button_flag == false) {
-    remaining_time = need_washing_time;
-    //Generating Threads
-    Washing_exe = new Com_Washing();
-    //Execution start
-    Washing_exe.start();
-  }
+  port.write("washing,0,0\n");
+  //if (process_toggle_flag == false && process_button_flag == false) {
+  //  remaining_time = need_washing_time;
+  //  //Generating Threads
+  //  Washing_exe = new Com_Washing();
+  //  //Execution start
+  //  Washing_exe.start();
+  //}
 }
 /*「LOADING」ボタンが押されたときに実行される関数 */
 void Loading() {
@@ -451,14 +452,14 @@ void Close() {
   start_discharge_time = 10000000;
   remaining_time = 0;
   temp_Correct = 0;
-  port.write("off_pump_12ch,0,0\n");
-  port.write("off_pump_dba,0,0\n");
+  //port.write("off_pump_12ch,0,0\n");
+  //port.write("off_pump_dba,0,0\n");
   port.write("reset_arduino,0,0\n");
 
-  Washing_exe.stopRunning();
-  Loading_exe.stopRunning();
-  Collecting_exe.stopRunning();
-  Discharge_exe.stopRunning();
+  //Washing_exe.stopRunning();
+  //Loading_exe.stopRunning();
+  //Collecting_exe.stopRunning();
+  //Discharge_exe.stopRunning();
 }
 
 //------------------------
