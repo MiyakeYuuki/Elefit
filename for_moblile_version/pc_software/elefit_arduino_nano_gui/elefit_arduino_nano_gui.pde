@@ -250,6 +250,14 @@ void draw_gauge(int percentage, float y, String name) {
 
 // Function to draw all gauge, control pump
 void draw() {
+  while(port.available()>0){
+  String progress = port.readString();
+  if(progress != null){
+  println(progress);
+}
+  
+  }
+  
   int font_size = width/56;
 
   background(200); // 背景をグレーに設定
@@ -280,9 +288,9 @@ void draw() {
   temp -= (long)(min(need_loading_time, loading_time));
   temp -= (long)(min(need_collecting_time, collecting_time));
   temp -= (long)(min(need_discharge_time, discharge_time));
-  println("washing_time/need_washing_time="+washing_time+"/"+need_washing_time);
-  println("loading_time/need_loading_time="+loading_time+"/"+need_loading_time);
-  println("collecting_time/need_collecting_time="+collecting_time+"/"+need_collecting_time);
+  //println("washing_time/need_washing_time="+washing_time+"/"+need_washing_time);
+  //println("loading_time/need_loading_time="+loading_time+"/"+need_loading_time);
+  //println("collecting_time/need_collecting_time="+collecting_time+"/"+need_collecting_time);
 
   if (process_button_flag == true) {
     //temp += temp_Correct;
@@ -338,13 +346,14 @@ void Washing() {
 }
 /*「LOADING」ボタンが押されたときに実行される関数 */
 void Loading() {
-  if (process_toggle_flag == false && process_button_flag == false) {
-    remaining_time = need_loading_time;
-    //Generating Threads
-    Loading_exe = new Com_Loading();
-    //Execution start
-    Loading_exe.start();
-  }
+  port.write("loading,0,0\n");
+  //if (process_toggle_flag == false && process_button_flag == false) {
+  //  remaining_time = need_loading_time;
+  //  //Generating Threads
+  //  Loading_exe = new Com_Loading();
+  //  //Execution start
+  //  Loading_exe.start();
+  //}
 }
 
 /*「COLLECTING」ボタンが押されたときに実行される関数 */
@@ -559,7 +568,7 @@ class Com_Loading extends Thread {
         port.write("on_pump_dba,3,0\n");       //PumpC activation
         delay(1000);
       } else if (load_Phase1 + load_Phase2 + load_Phase3 + load_Phase4 + load_Phase5 <= ((millis()/1000)-start_loading_time) && ((millis()/1000)-start_loading_time) < load_Phase1 + load_Phase2 + load_Phase3 + load_Phase4 + load_Phase5 + load_Phase6) {  //12ch_Pump activation for 60 sec( ～ [sec]). Phase6
-        port.write("off_pump_dba,3,0\n");      //Stop PumpB
+        port.write("off_pump_dba,3,0\n");      //Stop PumpC
         port.write("on_pump_12ch,100,0\n");    //12ch_Pump activation
         delay(1000);
       } else if (load_Phase1 + load_Phase2 + load_Phase3 + load_Phase4 + load_Phase5 + load_Phase6 <= ((millis()/1000)-start_loading_time) && ((millis()/1000)-start_loading_time) < load_Phase1 + load_Phase2 + load_Phase3 + load_Phase4 + load_Phase5*2 + load_Phase6) {  // Phase5(2回目)
@@ -567,7 +576,7 @@ class Com_Loading extends Thread {
         port.write("on_pump_dba,3,0\n");       //PumpC activation
         delay(1000);
       } else if (load_Phase1 + load_Phase2 + load_Phase3 + load_Phase4 + load_Phase5*2 + load_Phase6 <= ((millis()/1000)-start_loading_time) && ((millis()/1000)-start_loading_time) < load_Phase1 + load_Phase2 + load_Phase3 + load_Phase4 + load_Phase5*2 + load_Phase6*2) {  // Phase6(2回目)
-        port.write("off_pump_dba,3,0\n");      //Stop PumpB
+        port.write("off_pump_dba,3,0\n");      //Stop PumpC
         port.write("on_pump_12ch,100,0\n");    //12ch_Pump activation
         delay(1000);
       } else if (load_Phase1 + load_Phase2 + load_Phase3 + load_Phase4 + load_Phase5*2 + load_Phase6*2 <= ((millis()/1000)-start_loading_time) && ((millis()/1000)-start_loading_time) < load_Phase1 + load_Phase2 + load_Phase3 + load_Phase4 + load_Phase5*3 + load_Phase6*2) {  // Phase5(3回目)
@@ -575,7 +584,7 @@ class Com_Loading extends Thread {
         port.write("on_pump_dba,3,0\n");       //PumpC activation
         delay(1000);
       } else if (load_Phase1 + load_Phase2 + load_Phase3 + load_Phase4 + load_Phase5*3 + load_Phase6*2 <= ((millis()/1000)-start_loading_time) && ((millis()/1000)-start_loading_time) < load_Phase1 + load_Phase2 + load_Phase3 + load_Phase4 + load_Phase5*3 + load_Phase6*3) {  // Phase6(3回目)
-        port.write("off_pump_dba,3,0\n");      //Stop PumpB
+        port.write("off_pump_dba,3,0\n");      //Stop PumpC
         port.write("on_pump_12ch,100,0\n");    //12ch_Pump activation
         delay(1000);
       } else {

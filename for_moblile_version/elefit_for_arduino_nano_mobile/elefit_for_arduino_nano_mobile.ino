@@ -170,7 +170,9 @@ void loop() {
     else if (elements[0] == "washing") { // Washingの処理を実行
       washing();
     }
-
+    else if (elements[0] == "loading") { // Loadingの処理を実行
+      loading();
+    }
 
 
 
@@ -282,17 +284,60 @@ void washing() {
   step_back(200);
   /* 1-1 */
   on_pump_dba(1);
-  delay(18000); // Wait 18 sec
+  delay(18000); // Wait for 18 sec
   off_pump_dba();
   /* 1-2 */
   on_pump_12ch(100,0);
-  delay(45000); // Wait 45 sec
+  delay(45000); // Wait for 45 sec
   off_pump_12ch();
   /* 1-3 */
   start_time = millis(); // pwm_pump_12chの実行開始時刻を保存
-  pwm_pump_12ch(60000); // Wait 60 sec (test = 6 sec)
+  pwm_pump_12ch(60000); // Wait for 60 sec (test = 6 sec)
   /* 1-4 */
   on_pump_12ch(100,0);
-  delay(30000); // Wait 30 sec
+  delay(30000); // Wait for 30 sec
   off_pump_12ch();
 }
+
+/* Phase2（Loading） */
+void loading() {
+  /* 2-1 */
+  on_pump_dba(2);
+  delay(19000); // Wait for 19 sec
+  off_pump_dba();
+  /* 2-2 */
+  on_pump_12ch(100,0);
+  delay(45000); // Wait for 45 sec
+  off_pump_12ch();
+  /* 2-3 */
+  delay(30000); // Wait for 300 sec (test = 30 sec) 
+  /* 2-4 */
+  on_pump_12ch(100,0);
+  delay(25000); // Wait for 250 sec (test = 25 sec) 
+  off_pump_12ch();
+  /* 2-5-1 */
+  on_pump_dba(3);
+  delay(4000); // Wait for 4 sec
+  off_pump_dba();
+  /* 2-6-1 */
+  on_pump_12ch(100,0);
+  delay(60000); // Wait for 60 sec
+  off_pump_12ch();
+  /* 2-5-2 */
+  on_pump_dba(3);
+  delay(4000); // Wait for 4 sec
+  off_pump_dba();
+  /* 2-6-2 */
+  on_pump_12ch(100,0);
+  delay(60000); // Wait for 60 sec
+  off_pump_12ch();
+  /* 2-5-3 */
+  on_pump_dba(3);
+  delay(4000); // Wait for 4 sec
+  off_pump_dba();
+  /* 2-6-3 */
+  on_pump_12ch(100,0);
+  delay(60000); // Wait for 60 sec
+  off_pump_12ch();
+}
+ 
