@@ -358,13 +358,14 @@ void Loading() {
 
 /*「COLLECTING」ボタンが押されたときに実行される関数 */
 void Collecting() {
-  if (process_toggle_flag == false && process_button_flag == false) {
-    remaining_time = need_collecting_time;
-    //Generating Threads
-    Collecting_exe = new Com_Collecting();
-    //Execution start
-    Collecting_exe.start();
-  }
+  port.write("collecting,0,0\n");
+  //if (process_toggle_flag == false && process_button_flag == false) {
+  //  remaining_time = need_collecting_time;
+  //  //Generating Threads
+  //  Collecting_exe = new Com_Collecting();
+  //  //Execution start
+  //  Collecting_exe.start();
+  //}
 }
 
 void pump_1(boolean theFlag){
@@ -401,19 +402,20 @@ void pump_12ch(boolean theFlag){
 
 /*「ALL PHASE」ボタンが押されたときに実行される関数 */
 void AllPhase() {
-  if (process_toggle_flag == false && process_button_flag == false) {
-    remaining_time = need_washing_time + need_loading_time + need_collecting_time;  // 全工程にかかる時間は、Phase1(Washing)＋Phase2(Loading)、Phase3(Collecting)の時間
-    start_washing_time = (long)millis()/1000;  // Phase1(Washing)の開始時間
-    start_loading_time = (long)millis()/1000 + need_washing_time;  // Phase2(Loading)の開始時間
-    start_collecting_time = (long)millis()/1000 + need_washing_time + need_loading_time;  // Phase3(Collecting)の開始時間
-    println("start_washing_time="+start_washing_time);
-    println("start_loading_time="+start_loading_time);
-    println("start_collecting_time="+start_collecting_time);
-    println("need_loading_time="+need_loading_time);
-    //Generating Threads（全工程を実行するためのスレッドを生成）
-    AllPhase_exe = new Com_AllPhase();
-    //Execution start（全工程を実行）
-    AllPhase_exe.start();
+  port.write("all_phase,0,0\n");
+  //if (process_toggle_flag == false && process_button_flag == false) {
+  //  remaining_time = need_washing_time + need_loading_time + need_collecting_time;  // 全工程にかかる時間は、Phase1(Washing)＋Phase2(Loading)、Phase3(Collecting)の時間
+  //  start_washing_time = (long)millis()/1000;  // Phase1(Washing)の開始時間
+  //  start_loading_time = (long)millis()/1000 + need_washing_time;  // Phase2(Loading)の開始時間
+  //  start_collecting_time = (long)millis()/1000 + need_washing_time + need_loading_time;  // Phase3(Collecting)の開始時間
+  //  println("start_washing_time="+start_washing_time);
+  //  println("start_loading_time="+start_loading_time);
+  //  println("start_collecting_time="+start_collecting_time);
+  //  println("need_loading_time="+need_loading_time);
+  //  //Generating Threads（全工程を実行するためのスレッドを生成）
+  //  AllPhase_exe = new Com_AllPhase();
+  //  //Execution start（全工程を実行）
+  //  AllPhase_exe.start();
   }
 }
 /*「LOADING COLLECTING」ボタンが押されたときに実行される関数 */

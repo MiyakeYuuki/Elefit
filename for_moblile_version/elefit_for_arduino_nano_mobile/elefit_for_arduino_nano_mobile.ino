@@ -21,20 +21,29 @@
 
 #define ELEMENTS_NUM 3 /**< カンマ区切りデータの項目数 */
 
+/* 12ch pump の設定 */
 int PWM_RANGE     = 100; //Maximum value of generated PWM(1~100)
 int FREQ          = 100; //pwm frequency (Hz)
 int reverse = 0;         //12chpump reverse func
 int speed1 = 100;       //12chpump(R) revsepeed
 int speed2 = 100;       //12chpump(L) revsepeed
 
-static String elements[ELEMENTS_NUM];
+/* コマンド受信関連の変数 */
+static String elements[ELEMENTS_NUM]; /*受信したコマンドをカンマで区切って格納するための配列*/
 static int received_elements_num = 0; /**< 受信済み文字列の数 */
 int rx_sig_count_prev = 0 ; /*信号を受信するとカウントアップ*/
 int rx_sig_count = 0 ; /*信号を受信するとカウントアップ*/
 
+/* 処理実行タイミングの制御関連の変数 */
 unsigned long start_time;  // pwm_pump処理の実行開始時刻
 boolean running_flag = false;   // 処理の実行管理用フラグ
 
+/* Phase1(Washing)、各処理の実行時間（t_11~t_14）[sec] */
+unsigned long t_11 = 18;
+/* Phase2(Loading)、各処理の実行時間（t_21~t_27）[sec] */
+/* Phase3(Collecting)、各処理の実行時間（t_31~t_36） [sec]*/
+
+/* Arduinoリセット用関数の定義 */
 void(*resetFunc)(void) = 0; // Arduinoをリセットボタンでなく、プログラムからリセットするための関数
 
 // シリアル通信でスマホからの命令を読み込む関数
@@ -173,7 +182,12 @@ void loop() {
     else if (elements[0] == "loading") { // Loadingの処理を実行
       loading();
     }
-
+    else if (elements[0] == "collecting") { // Collectingの処理を実行
+      collecting();
+    }
+    else if (elements[0] == "all_phase") { // All phase（Washing→Loading→Collecting）の処理を実行
+      all_phase();
+    }
 
 
 
@@ -284,18 +298,18 @@ void washing() {
   step_back(200);
   /* 1-1 */
   on_pump_dba(1);
-  delay(18000); // Wait for 18 sec
+  delay(t_11*1000); // Wait for 18 sec
   off_pump_dba();
   /* 1-2 */
   on_pump_12ch(100,0);
-  delay(45000); // Wait for 45 sec
+  delay(45*1000); // Wait for 45 sec
   off_pump_12ch();
   /* 1-3 */
   start_time = millis(); // pwm_pump_12chの実行開始時刻を保存
-  pwm_pump_12ch(60000); // Wait for 60 sec (test = 6 sec)
+  pwm_pump_12ch(60*1000); // Wait for 60 sec (test = 6 sec)
   /* 1-4 */
   on_pump_12ch(100,0);
-  delay(30000); // Wait for 30 sec
+  delay(30*1000); // Wait for 30 sec
   off_pump_12ch();
 }
 
@@ -303,41 +317,77 @@ void washing() {
 void loading() {
   /* 2-1 */
   on_pump_dba(2);
-  delay(19000); // Wait for 19 sec
+  delay(19*1000); // Wait for 19 sec
   off_pump_dba();
   /* 2-2 */
   on_pump_12ch(100,0);
-  delay(45000); // Wait for 45 sec
+  delay(45*1000); // Wait for 45 sec
   off_pump_12ch();
   /* 2-3 */
-  delay(30000); // Wait for 300 sec (test = 30 sec) 
+  delay(30*1000); // Wait for 300 sec (test = 30 sec) 
   /* 2-4 */
   on_pump_12ch(100,0);
-  delay(25000); // Wait for 250 sec (test = 25 sec) 
+  delay(25*1000); // Wait for 250 sec (test = 25 sec) 
   off_pump_12ch();
   /* 2-5-1 */
   on_pump_dba(3);
-  delay(4000); // Wait for 4 sec
+  delay(4*1000); // Wait for 4 sec
   off_pump_dba();
   /* 2-6-1 */
   on_pump_12ch(100,0);
-  delay(60000); // Wait for 60 sec
+  delay(60*1000); // Wait for 60 sec
   off_pump_12ch();
   /* 2-5-2 */
   on_pump_dba(3);
-  delay(4000); // Wait for 4 sec
+  delay(4*1000); // Wait for 4 sec
   off_pump_dba();
   /* 2-6-2 */
   on_pump_12ch(100,0);
-  delay(60000); // Wait for 60 sec
+  delay(60*1000); // Wait for 60 sec
   off_pump_12ch();
   /* 2-5-3 */
   on_pump_dba(3);
-  delay(4000); // Wait for 4 sec
+  delay(4*1000); // Wait for 4 sec
   off_pump_dba();
   /* 2-6-3 */
   on_pump_12ch(100,0);
-  delay(60000); // Wait for 60 sec
+  delay(60*1000); // Wait for 60 sec
   off_pump_12ch();
 }
- 
+
+/* Phase3（Collecting） */
+void collecting() {
+  /* 3-1 */
+  on_pump_dba(3);
+  delay(15000); // Wait for 15 sec
+  off_pump_dba();
+  /* 3-2 */
+  on_pump_12ch(100,0);
+  delay(45000); // Wait for 45 sec
+  off_pump_12ch();
+  /* 3-3 */
+  on_pump_12ch(100,1);
+  delay(5000); // Wait for 5 sec
+  off_pump_12ch();
+  /* 3-4 */
+  step_front(160);
+  on_pump_12ch(100,0);
+  delay(60000); // Wait for 60 sec
+  off_pump_12ch();
+  /* 3-5 */
+  on_pump_12ch(100,1);
+  delay(5000); // Wait for 5 sec
+  off_pump_12ch();
+  /* 3-6 */
+  step_back(180);
+  on_pump_12ch(100,0);
+  delay(100000); // Wait for 100 sec
+  off_pump_12ch();
+}
+
+void all_phase(){
+  washing();
+  loading();
+  collecting();
+  }
+  
