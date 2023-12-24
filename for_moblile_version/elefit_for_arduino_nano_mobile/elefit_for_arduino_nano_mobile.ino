@@ -40,14 +40,61 @@ boolean running_flag = false;   // 処理の実行管理用フラグ
 
 /* Phase1(Washing)、各処理の実行時間（t_11~t_14）[sec] */
 unsigned long t_11 = 18;
-/* Phase2(Loading)、各処理の実行時間（t_21~t_27）[sec] */
+unsigned long t_12 = 45;
+unsigned long t_13 = 60;  // Wait for 600 sec (test = 60 sec)
+unsigned long t_14 = 30;
+unsigned long t_1_error = 3 // ステッピングモータの動作などで発生する遅延
+/* Phase2(Loading)、各処理の実行時間（t_21~t_26）[sec] */
+unsigned long t_21 = 19;
+unsigned long t_22 = 45;
+unsigned long t_23 = 30;  // Wait for 300 sec (test = 30 sec)
+unsigned long t_24 = 25;  // Wait for 250 sec (test = 25 sec)
+unsigned long t_25 = 4;
+unsigned long t_26 = 60;
+unsigned long t_2_error = 0 // ステッピングモータの動作などで発生する遅延
 /* Phase3(Collecting)、各処理の実行時間（t_31~t_36） [sec]*/
+unsigned long t_31 = 15;
+unsigned long t_32 = 45;
+unsigned long t_33 = 5;
+unsigned long t_34 = 60;
+unsigned long t_35 = 5;
+unsigned long t_36 = 100;
+unsigned long t_3_error = 5 // ステッピングモータの動作などで発生する遅延
+/* 進捗表示のゲージ描画用 */
+String excecuted_process = ""; // 実行されているプロセス名を保存
+unsigned long estimated_time = 0; // 動作にかかる時間の合計値（命令受信後に計算）
+// Phase1(Washing)の所要時間合計
+unsigned long washing_time_total    = t_11 + t_12 + t_13 + t_14 + t_1_error;
+// Phase2(Loading)の所要時間合計
+unsigned long loading_time_total    = t_21 + t_22 + t_23 + t_24 + (t_25 + t_26) * 3 + t_2_error;
+// Phase3(Collecting)の所要時間合計
+unsigned long collecting_time_total = t_32 + t_32 + t_33 + t_34 + t_35 + t_36 + t_3_error;
+// Phase1(Washing), Phase2(Loading), Phase3 (Collecting)が実行された時間[msec]
+unsigned long washing_time = 0; // Washing の実行時間[msec]
+unsigned long loading_time = 0; // Loading の実行時間[msec]
+unsigned long collecting_time = 0; // Collecting の実行時間[msec]
 
 /* Arduinoリセット用関数の定義 */
 void(*resetFunc)(void) = 0; // Arduinoをリセットボタンでなく、プログラムからリセットするための関数
 
 // シリアル通信でスマホからの命令を読み込む関数
 void read_data() {
+    if (excecuted_process == "washing") { // Washingの処理を実行
+      washing_time += 500; // 実行時間を加算（500[msec]はタイマー割り込みの周期）
+    }
+    else if (excecuted_process == "loading") { // Loadingの処理を実行
+      loading_time += 500; // 実行時間を加算（500[msec]はタイマー割り込みの周期）
+    }
+    else if (excecuted_process == "collecting") { // Collectingの処理を実行
+      collecting_time += 500; // 実行時間を加算（500[msec]はタイマー割り込みの周期）
+    }
+    else if (excecuted_process == "close") {
+      washing_time = 0; // 実行時間をリセット
+      loading_time = 0; // 実行時間をリセット
+      loading_time = 0; // 実行時間をリセット
+    }
+
+  
   if (Serial.available()) {
     rx_sig_count++;
     String line;              // 受信文字列
@@ -164,9 +211,9 @@ void loop() {
     else if (elements[0] == "on_pump_12ch") { // 6chポンプ×2を駆動
       on_pump_12ch(elements[1].toInt(), elements[2].toInt());
     }
-//    else if (elements[0] == "pwm_pump_12ch") { // 6ch×2のポンプをわずかに正転させ、停止する
-//      pwm_pump_12ch();
-//    }
+    //    else if (elements[0] == "pwm_pump_12ch") { // 6ch×2のポンプをわずかに正転させ、停止する
+    //      pwm_pump_12ch();
+    //    }
     else if (elements[0] == "off_pump_12ch") { // 6chポンプ×2を停止
       off_pump_12ch();
     }
@@ -191,7 +238,7 @@ void loop() {
 
 
 
-    
+
     rx_sig_count_prev = rx_sig_count; // 信号を1回受信したら更新（これで次の命令を受信するまで動作を実行しない）
     Serial.print("rx_sig_count = ");
     Serial.print(rx_sig_count);
@@ -281,15 +328,15 @@ void off_pump_12ch() {
 }
 /* 6ch×2のポンプをわずかに正転させ、停止する関数 */
 void pwm_pump_12ch(unsigned long running_time) {
-  unsigned long curr; // 現在時刻の保存用変数  
+  unsigned long curr; // 現在時刻の保存用変数
   // 指定した実行時間（running_time）の間処理を繰り返す
   do {
-  curr = millis();
-  on_pump_12ch(80, 0);
-  delay(385);
-  off_pump_12ch();
-  delay(625);
-  }while(curr-start_time<=running_time);
+    curr = millis();
+    on_pump_12ch(80, 0);
+    delay(385);
+    off_pump_12ch();
+    delay(625);
+  } while (curr - start_time <= running_time);
 }
 
 /* Phase1（Washing） */
@@ -298,18 +345,18 @@ void washing() {
   step_back(200);
   /* 1-1 */
   on_pump_dba(1);
-  delay(t_11*1000); // Wait for 18 sec
+  delay(t_11 * 1000); // Wait for 18 sec
   off_pump_dba();
   /* 1-2 */
-  on_pump_12ch(100,0);
-  delay(45*1000); // Wait for 45 sec
+  on_pump_12ch(100, 0);
+  delay(t_12 * 1000); // Wait for 45 sec
   off_pump_12ch();
   /* 1-3 */
   start_time = millis(); // pwm_pump_12chの実行開始時刻を保存
-  pwm_pump_12ch(60*1000); // Wait for 60 sec (test = 6 sec)
+  pwm_pump_12ch(t_13 * 1000); // Wait for 600 sec (test = 60 sec)
   /* 1-4 */
-  on_pump_12ch(100,0);
-  delay(30*1000); // Wait for 30 sec
+  on_pump_12ch(100, 0);
+  delay(t_14 * 1000); // Wait for 30 sec
   off_pump_12ch();
 }
 
@@ -317,41 +364,41 @@ void washing() {
 void loading() {
   /* 2-1 */
   on_pump_dba(2);
-  delay(19*1000); // Wait for 19 sec
+  delay(t_21 * 1000); // Wait for 19 sec
   off_pump_dba();
   /* 2-2 */
-  on_pump_12ch(100,0);
-  delay(45*1000); // Wait for 45 sec
+  on_pump_12ch(100, 0);
+  delay(t_22 * 1000); // Wait for 45 sec
   off_pump_12ch();
   /* 2-3 */
-  delay(30*1000); // Wait for 300 sec (test = 30 sec) 
+  delay(t_23 * 1000); // Wait for 300 sec (test = 30 sec)
   /* 2-4 */
-  on_pump_12ch(100,0);
-  delay(25*1000); // Wait for 250 sec (test = 25 sec) 
+  on_pump_12ch(100, 0);
+  delay(t_24 * 1000); // Wait for 250 sec (test = 25 sec)
   off_pump_12ch();
   /* 2-5-1 */
   on_pump_dba(3);
-  delay(4*1000); // Wait for 4 sec
+  delay(t_25 * 1000); // Wait for 4 sec
   off_pump_dba();
   /* 2-6-1 */
-  on_pump_12ch(100,0);
-  delay(60*1000); // Wait for 60 sec
+  on_pump_12ch(100, 0);
+  delay(t_26 * 1000); // Wait for 60 sec
   off_pump_12ch();
   /* 2-5-2 */
   on_pump_dba(3);
-  delay(4*1000); // Wait for 4 sec
+  delay(t_25 * 1000); // Wait for 4 sec
   off_pump_dba();
   /* 2-6-2 */
-  on_pump_12ch(100,0);
-  delay(60*1000); // Wait for 60 sec
+  on_pump_12ch(100, 0);
+  delay(t_26 * 1000); // Wait for 60 sec
   off_pump_12ch();
   /* 2-5-3 */
   on_pump_dba(3);
-  delay(4*1000); // Wait for 4 sec
+  delay(t_25 * 1000); // Wait for 4 sec
   off_pump_dba();
   /* 2-6-3 */
-  on_pump_12ch(100,0);
-  delay(60*1000); // Wait for 60 sec
+  on_pump_12ch(100, 0);
+  delay(t_26 * 1000); // Wait for 60 sec
   off_pump_12ch();
 }
 
@@ -359,35 +406,34 @@ void loading() {
 void collecting() {
   /* 3-1 */
   on_pump_dba(3);
-  delay(15000); // Wait for 15 sec
+  delay(t_31 * 1000); // Wait for 15 sec
   off_pump_dba();
   /* 3-2 */
-  on_pump_12ch(100,0);
-  delay(45000); // Wait for 45 sec
+  on_pump_12ch(100, 0);
+  delay(t_32 * 1000); // Wait for 45 sec
   off_pump_12ch();
   /* 3-3 */
-  on_pump_12ch(100,1);
-  delay(5000); // Wait for 5 sec
+  on_pump_12ch(100, 1);
+  delay(t_33 * 1000); // Wait for 5 sec
   off_pump_12ch();
   /* 3-4 */
   step_front(160);
-  on_pump_12ch(100,0);
-  delay(60000); // Wait for 60 sec
+  on_pump_12ch(100, 0);
+  delay(t_34 * 1000); // Wait for 60 sec
   off_pump_12ch();
   /* 3-5 */
-  on_pump_12ch(100,1);
-  delay(5000); // Wait for 5 sec
+  on_pump_12ch(100, 1);
+  delay(t_35 * 1000); // Wait for 5 sec
   off_pump_12ch();
   /* 3-6 */
   step_back(180);
-  on_pump_12ch(100,0);
-  delay(100000); // Wait for 100 sec
+  on_pump_12ch(100, 0);
+  delay(t_36 * 1000); // Wait for 100 sec
   off_pump_12ch();
 }
 
-void all_phase(){
+void all_phase() {
   washing();
   loading();
   collecting();
-  }
-  
+}
