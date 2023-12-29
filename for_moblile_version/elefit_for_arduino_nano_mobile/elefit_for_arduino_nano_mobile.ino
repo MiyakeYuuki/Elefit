@@ -70,7 +70,7 @@ unsigned long washing_time_total    = (t_11 + t_12 + t_13 + t_14 + t_1_error) * 
 // Phase2(Loading)の所要時間合計[msec]
 unsigned long loading_time_total    = (t_21 + t_22 + t_23 + t_24 + (t_25 + t_26) * 3 + t_2_error) * 1000;
 // Phase3(Collecting)の所要時間合計[msec]
-unsigned long collecting_time_total = (t_32 + t_32 + t_33 + t_34 + t_35 + t_36 + t_3_error) * 1000;
+unsigned long collecting_time_total = (t_31 + t_32 + t_33 + t_34 + t_35 + t_36 + t_3_error) * 1000;
 // Phase1(Washing), Phase2(Loading), Phase3 (Collecting)が実行された時間[msec]
 unsigned long washing_time = 0; // Washing の実行時間[msec]
 unsigned long loading_time = 0; // Loading の実行時間[msec]
@@ -85,40 +85,55 @@ void(*resetFunc)(void) = 0; // Arduinoをリセットボタンでなく、プロ
 
 // シリアル通信でスマホからの命令を読み込む関数
 void read_data() {
-  if (excecuted_process == "washing") { // Washingの処理を実行
+  /* 残り時間を計算 */
+  if(excecuted_process == "washing" && elements[0] != "all_phase"){
+    the_remaining_time = estimated_time_total - washing_time;
+    }
+  else if(excecuted_process == "loading" && elements[0] != "all_phase"){
+    the_remaining_time = estimated_time_total - loading_time;
+  }else if(excecuted_process == "collecting" && elements[0] != "all_phase"){
+    the_remaining_time = estimated_time_total - collecting_time;
+  }else{
+    the_remaining_time = estimated_time_total - (washing_time + loading_time + collecting_time); //　残り時間を更新
+    }
+  
+  if (excecuted_process == "washing" && washing_progress * 100 <= 100) { // Washingの処理を実行
     washing_time += 500; // 実行時間を加算（500[msec]はタイマー割り込みの周期）
   }
-  else if (excecuted_process == "loading") { // Loadingの処理を実行
+  else if (excecuted_process == "loading" && loading_progress * 100 <= 100) { // Loadingの処理を実行
     loading_time += 500; // 実行時間を加算（500[msec]はタイマー割り込みの周期）
   }
-  else if (excecuted_process == "collecting") { // Collectingの処理を実行
+  else if (excecuted_process == "collecting" && collecting_progress * 100 <= 100) { // Collectingの処理を実行
     collecting_time += 500; // 実行時間を加算（500[msec]はタイマー割り込みの周期）
   }
   else if (excecuted_process == "close") {
     washing_time = 0; // 実行時間をリセット
     loading_time = 0; // 実行時間をリセット
-    loading_time = 0; // 実行時間をリセット
+    collecting_time = 0; // 実行時間をリセット
+  } else {
+    the_remaining_time = 0;
   }
 
-  //  the_remaining_time -= 500 ;
-  the_remaining_time = estimated_time_total - (washing_time + loading_time + collecting_time); //　残り時間を更新
-  if (the_remaining_time > 0) {
-    Serial.print("The remaining time[msec]:");
-    Serial.print(the_remaining_time);
-    Serial.println();
-    washing_progress = washing_time / washing_time_total;
-    loading_progress = loading_time / loading_time_total;
-    collecting_progress = collecting_time / collecting_time_total;
-    Serial.print("Progress[%]:");
-    Serial.print("Washing,");
-    Serial.print(washing_progress*100);
-    Serial.print(",Loading,");
-    Serial.print(loading_progress*100);
-    Serial.print(",Collecting,");
-    Serial.print(collecting_progress*100);
-    Serial.println();
-    Serial.println();
-  }
+  /* 残り時間を表示 */
+  Serial.print("The remaining time[sec]:");
+  Serial.print((int)(the_remaining_time/1000));
+  Serial.println();
+
+  /* 進捗を計算 */
+  washing_progress = (float)(washing_time) / washing_time_total;
+  loading_progress = (float)(loading_time) / loading_time_total;
+  collecting_progress = (float)(collecting_time) / collecting_time_total;
+
+  /* 進捗を計算 */
+  Serial.print("Progress[%]:");
+  Serial.print("Washing,");
+  Serial.print((int)(washing_progress * 100));
+  Serial.print(",Loading,");
+  Serial.print((int)(loading_progress * 100));
+  Serial.print(",Collecting,");
+  Serial.print((int)(collecting_progress * 100));
+  Serial.println();
+  Serial.println();
 
   if (Serial.available()) {
     rx_sig_count++;
@@ -255,14 +270,17 @@ void loop() {
     }
     else if (elements[0] == "loading") { // Loadingの処理を実行
       estimated_time_total = loading_time_total;
+      the_remaining_time = estimated_time_total; // 合計の所要時間を保存（進捗表示のため）
       loading();
     }
     else if (elements[0] == "collecting") { // Collectingの処理を実行
       estimated_time_total = collecting_time_total;
+      the_remaining_time = estimated_time_total; // 合計の所要時間を保存（進捗表示のため）
       collecting();
     }
     else if (elements[0] == "all_phase") { // All phase（Washing→Loading→Collecting）の処理を実行
       estimated_time_total = washing_time_total + loading_time_total + collecting_time_total;
+      the_remaining_time = estimated_time_total; // 合計の所要時間を保存（進捗表示のため）
       all_phase();
     }
 
