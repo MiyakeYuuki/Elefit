@@ -14,6 +14,14 @@ long start_loadingcollecting_time =  10000000;
 long start_discharge_time =  10000000;
 long remaining_time = 0;
 int slp = 300;               //Time of Soak in Nitric(5 min)
+String[] time_and_progress;
+int the_remaining_time = 0;
+int washing_progress = 0;
+int loading_progress = 0;
+int collecting_progress = 0;
+int lf = 10; // ASCIIの改行
+int cr = 13; // ASCIIの行頭復帰
+
 boolean pump_12ch;  //6ch*2 pump
 boolean reverse;
 boolean pump_1;     //Diaphragm pump*3
@@ -37,7 +45,6 @@ Serial port;
 ControlP5 cp5;
 
 void setup() {
-
   //size(800, 450);  // W:H = 16:9
   //size(1120, 630);  // W:H = 16:9
   /*Display settings*/
@@ -114,11 +121,11 @@ void setup() {
     .setColorBackground(color(181, 255, 20))
     .setColorForeground(color(121, 200, 20))
     .setCaptionLabel("   Loading\n          ↓   \nCollecting")
-    .align(29*button_width/6,height-5*button_height/2,ControlP5.CENTER,ControlP5.UP)  //  8.5*width/10,11*height/14
+    .align(29*button_width/6, height-5*button_height/2, ControlP5.CENTER, ControlP5.UP)  //  8.5*width/10,11*height/14
     //.setPadding(1,0)
     .setColorCaptionLabel(color(0))
     .setFont(cf1) ;
-    
+
 
   cp5.addButton("Front")
     .setPosition(button_width/6, height-5*button_height/4)
@@ -250,14 +257,32 @@ void draw_gauge(int percentage, float y, String name) {
 
 // Function to draw all gauge, control pump
 void draw() {
-  while(port.available()>0){
-  String progress = port.readString();
-  if(progress != null){
-  println(progress);
-}
-  
+  while (port.available()>0) {
+    String progress = port.readStringUntil(lf);
+    if (progress != null) {
+      print(progress);
+      String time_and_progress_lf = progress.replace("\n", "");
+      time_and_progress = time_and_progress_lf.split(",");
+      //println(time_and_progress.length);
+      if (time_and_progress.length==4) {
+        //println(time_and_progress[0]);
+        //println(time_and_progress[1]);
+        //println(time_and_progress[2]);
+        //println(time_and_progress[3]);
+        try {
+          the_remaining_time = Integer.parseInt(time_and_progress[0]);
+          washing_progress = Integer.parseInt(time_and_progress[1]);
+          loading_progress = Integer.parseInt(time_and_progress[2]);
+          collecting_progress = Integer.parseInt(time_and_progress[3]);
+        }
+        catch(NumberFormatException e) {
+          // エラーが発生したら、残り時間と進捗の更新をスキップ
+        }
+      }
+    } else {
+    }
   }
-  
+
   int font_size = width/56;
 
   background(200); // 背景をグレーに設定
@@ -267,27 +292,19 @@ void draw() {
     stroke(0, 100, j*255/width, 50);  //引数は(R,G,B,不透明度)の順番
     line(j*1.5, j, j, height/2.1);
   }
-
   long temp;
-  long washing_time = (long)max(0, (millis()/1000)-start_washing_time);
-  long loading_time = (long)max(0, (millis()/1000)-start_loading_time);
-  long collecting_time = (long)max(0, (millis()/1000)-start_collecting_time);
-  long discharge_time = (long)max(0, (millis()/1000)-start_discharge_time);
-  draw_gauge((int)(min(100, 100*washing_time/need_washing_time)), height/36, "Washing");
-  draw_gauge((int)(min(100, 100*loading_time/(need_loading_time))), 5*height/36, "Loading");
-  draw_gauge((int)(min(100, 100*collecting_time/need_collecting_time)), 9*height/36, "Collecting");
-  draw_gauge((int)(min(100, 100*discharge_time/need_discharge_time)), 13*height/36, "Discharge");
-  
+  draw_gauge(washing_progress, height/36, "Washing");
+  draw_gauge(loading_progress, 5*height/36, "Loading");
+  draw_gauge(collecting_progress, 9*height/36, "Collecting");
+  //draw_gauge(discharge_progress, 13*height/36, "Discharge");
+
   // 残り時間表示
   fill(color(0));
   textSize(1.5*font_size);                  //テキストサイズ
   text("The Remaining Time", 2*width/3, 9*height/14);
 
-  temp = remaining_time;
-  temp -= (long)(min(need_washing_time, washing_time));
-  temp -= (long)(min(need_loading_time, loading_time));
-  temp -= (long)(min(need_collecting_time, collecting_time));
-  temp -= (long)(min(need_discharge_time, discharge_time));
+  temp = the_remaining_time;
+  //println(temp);
   //println("washing_time/need_washing_time="+washing_time+"/"+need_washing_time);
   //println("loading_time/need_loading_time="+loading_time+"/"+need_loading_time);
   //println("collecting_time/need_collecting_time="+collecting_time+"/"+need_collecting_time);
@@ -298,8 +315,10 @@ void draw() {
     temp = 0;
   }
 
-  int minutes = (int)(temp/60);
-  int seconds = (int)(temp%60);
+  //int minutes = (int)(Integer.parseInt(time_and_progress[0])/60);
+  //int seconds = (int)(Integer.parseInt(time_and_progress[0])%60);
+  int minutes = (int)(the_remaining_time/60);
+  int seconds = (int)(the_remaining_time%60);
   text(minutes, 11*width/16, 14*height/20);
   text("min", 11*width/16 + width/40, 14*height/20);
   text(seconds, 11*width/16 + width/10, 14*height/20);
@@ -368,34 +387,34 @@ void Collecting() {
   //}
 }
 
-void pump_1(boolean theFlag){
-  if(theFlag==true){
+void pump_1(boolean theFlag) {
+  if (theFlag==true) {
     port.write("on_pump_dba,1,0\n");
-  }else{
+  } else {
     port.write("off_pump_dba,0,0\n");
   }
 }
 
-void pump_2(boolean theFlag){
-  if(theFlag==true){
+void pump_2(boolean theFlag) {
+  if (theFlag==true) {
     port.write("on_pump_dba,2,0\n");
-  }else{
+  } else {
     port.write("off_pump_dba,0,0\n");
   }
 }
 
-void pump_3(boolean theFlag){
-  if(theFlag==true){
+void pump_3(boolean theFlag) {
+  if (theFlag==true) {
     port.write("on_pump_dba,3,0\n");
-  }else{
+  } else {
     port.write("off_pump_dba,0,0\n");
   }
 }
 
-void pump_12ch(boolean theFlag){
-  if(theFlag==true){
+void pump_12ch(boolean theFlag) {
+  if (theFlag==true) {
     port.write("on_pump_12ch,100,0\n");
-  }else{
+  } else {
     port.write("off_pump_12ch,0,0\n");
   }
 }
@@ -416,7 +435,7 @@ void AllPhase() {
   //  AllPhase_exe = new Com_AllPhase();
   //  //Execution start（全工程を実行）
   //  AllPhase_exe.start();
-  }
+  //}
 }
 /*「LOADING COLLECTING」ボタンが押されたときに実行される関数 */
 void LoadingCollecting() {
@@ -695,7 +714,7 @@ class Com_AllPhase extends Thread {
 
     start_allphase_time = (long)millis()/1000;
     println("start_allphase_time="+start_allphase_time);
-    
+
     washing_flag = false;
     loading_flag = false;
     collecting_flag = false;

@@ -114,27 +114,37 @@ void read_data() {
     the_remaining_time = 0;
   }
 
-  /* 残り時間を表示 */
-  Serial.print("The remaining time[sec]:");
-  Serial.print((int)(the_remaining_time/1000));
-  Serial.println();
+  /* 残り時間を表示（Arduinoシリアルモニタ用） */
+//  Serial.print("The remaining time[sec]:");
+//  Serial.print((int)(the_remaining_time/1000));
+//  Serial.println();
 
   /* 進捗を計算 */
   washing_progress = (float)(washing_time) / washing_time_total;
   loading_progress = (float)(loading_time) / loading_time_total;
   collecting_progress = (float)(collecting_time) / collecting_time_total;
 
-  /* 進捗を計算 */
-  Serial.print("Progress[%]:");
-  Serial.print("Washing,");
-  Serial.print((int)(washing_progress * 100));
-  Serial.print(",Loading,");
-  Serial.print((int)(loading_progress * 100));
-  Serial.print(",Collecting,");
-  Serial.print((int)(collecting_progress * 100));
-  Serial.println();
-  Serial.println();
+  /* 進捗を表示（Arduinoシリアルモニタ用）  */
+//  Serial.print("Progress[%]:");
+//  Serial.print("Washing,");
+//  Serial.print((int)(washing_progress * 100));
+//  Serial.print(",Loading,");
+//  Serial.print((int)(loading_progress * 100));
+//  Serial.print(",Collecting,");
+//  Serial.print((int)(collecting_progress * 100));
+//  Serial.println();
+//  Serial.println();
 
+  /* スマホ or PC に[動作残り時間(sec), Washingの進捗(%), Loadingの進捗(%), Collectingの進捗(%)]を送信 */
+  Serial.print((int)(the_remaining_time/1000));
+  Serial.print(",");
+  Serial.print((int)(washing_progress * 100));
+  Serial.print(",");
+  Serial.print((int)(loading_progress * 100));
+  Serial.print(",");  
+  Serial.print((int)(collecting_progress * 100));
+  Serial.print("\n");
+  
   if (Serial.available()) {
     rx_sig_count++;
     String line;              // 受信文字列
