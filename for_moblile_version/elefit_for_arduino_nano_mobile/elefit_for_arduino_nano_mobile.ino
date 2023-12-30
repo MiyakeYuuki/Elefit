@@ -60,6 +60,10 @@ unsigned long t_34 = 60;
 unsigned long t_35 = 5;
 unsigned long t_36 = 100;
 unsigned long t_3_error = 5; // ステッピングモータの動作などで発生する遅延
+/* Phase4(Discharge)、各処理の実行時間（t_41~t_46） [sec]*/
+unsigned long t_41 = 7;
+unsigned long t_42 = 280;
+unsigned long t_4_error = 3; // ステッピングモータの動作などで発生する遅延
 
 /* 進捗表示のゲージ描画用 */
 String excecuted_process = ""; // 実行されているプロセス名を保存
@@ -71,14 +75,18 @@ unsigned long washing_time_total    = (t_11 + t_12 + t_13 + t_14 + t_1_error) * 
 unsigned long loading_time_total    = (t_21 + t_22 + t_23 + t_24 + (t_25 + t_26) * 3 + t_2_error) * 1000;
 // Phase3(Collecting)の所要時間合計[msec]
 unsigned long collecting_time_total = (t_31 + t_32 + t_33 + t_34 + t_35 + t_36 + t_3_error) * 1000;
+// Phase4(Discharge)の所要時間合計[msec]
+unsigned long discharge_time_total = (t_41 + t_42 + t_4_error) * 1000;
 // Phase1(Washing), Phase2(Loading), Phase3 (Collecting)が実行された時間[msec]
 unsigned long washing_time = 0; // Washing の実行時間[msec]
 unsigned long loading_time = 0; // Loading の実行時間[msec]
 unsigned long collecting_time = 0; // Collecting の実行時間[msec]
+unsigned long discharge_time = 0; // Collecting の実行時間[msec]
 // Phase1(Washing), Phase2(Loading), Phase3 (Collecting)の進捗
 float washing_progress = 0;
 float loading_progress = 0;
 float collecting_progress = 0;
+float discharge_progress = 0;
 
 /* Arduinoリセット用関数の定義 */
 void(*resetFunc)(void) = 0; // Arduinoをリセットボタンでなく、プログラムからリセットするための関数
@@ -86,13 +94,17 @@ void(*resetFunc)(void) = 0; // Arduinoをリセットボタンでなく、プロ
 // シリアル通信でスマホからの命令を読み込む関数
 void read_data() {
   /* 残り時間を計算 */
-  if(excecuted_process == "washing" && elements[0] != "all_phase"){
+  if(excecuted_process == "washing" && elements[0] != "all_phase" && elements[0] != "lc"){
     the_remaining_time = estimated_time_total - washing_time;
     }
-  else if(excecuted_process == "loading" && elements[0] != "all_phase"){
+  else if(excecuted_process == "loading" && elements[0] != "all_phase" && elements[0] != "lc"){
     the_remaining_time = estimated_time_total - loading_time;
-  }else if(excecuted_process == "collecting" && elements[0] != "all_phase"){
+  }else if(excecuted_process == "collecting" && elements[0] != "all_phase" && elements[0] != "lc"){
     the_remaining_time = estimated_time_total - collecting_time;
+  }else if(excecuted_process == "discharge" && elements[0] != "all_phase" && elements[0] != "lc"){
+    the_remaining_time = estimated_time_total - discharge_time;
+  }else if(elements[0] == "lc"){
+    the_remaining_time = estimated_time_total - (loading_time + collecting_time);    
   }else{
     the_remaining_time = estimated_time_total - (washing_time + loading_time + collecting_time); //　残り時間を更新
     }
@@ -106,10 +118,14 @@ void read_data() {
   else if (excecuted_process == "collecting" && collecting_progress * 100 <= 100) { // Collectingの処理を実行
     collecting_time += 500; // 実行時間を加算（500[msec]はタイマー割り込みの周期）
   }
+  else if (excecuted_process == "discharge" && discharge_progress * 100 <= 100) { // Collectingの処理を実行
+    discharge_time += 500; // 実行時間を加算（500[msec]はタイマー割り込みの周期）
+  }  
   else if (excecuted_process == "close") {
     washing_time = 0; // 実行時間をリセット
     loading_time = 0; // 実行時間をリセット
     collecting_time = 0; // 実行時間をリセット
+    discharge_time = 0; // 実行時間をリセット
   } else {
     the_remaining_time = 0;
   }
@@ -123,6 +139,7 @@ void read_data() {
   washing_progress = (float)(washing_time) / washing_time_total;
   loading_progress = (float)(loading_time) / loading_time_total;
   collecting_progress = (float)(collecting_time) / collecting_time_total;
+  discharge_progress = (float)(discharge_time) / discharge_time_total;
 
   /* 進捗を表示（Arduinoシリアルモニタ用）  */
 //  Serial.print("Progress[%]:");
@@ -143,7 +160,9 @@ void read_data() {
   Serial.print((int)(loading_progress * 100));
   Serial.print(",");  
   Serial.print((int)(collecting_progress * 100));
-  Serial.print("\n");
+  Serial.print(",");  
+  Serial.print((int)(discharge_progress * 100));  
+//  Serial.print("");
   
   if (Serial.available()) {
     rx_sig_count++;
@@ -288,15 +307,22 @@ void loop() {
       the_remaining_time = estimated_time_total; // 合計の所要時間を保存（進捗表示のため）
       collecting();
     }
+    else if (elements[0] == "discharge") { // dischargeの処理を実行
+      estimated_time_total = discharge_time_total;
+      the_remaining_time = estimated_time_total; // 合計の所要時間を保存（進捗表示のため）
+      discharge();      
+    }
     else if (elements[0] == "all_phase") { // All phase（Washing→Loading→Collecting）の処理を実行
       estimated_time_total = washing_time_total + loading_time_total + collecting_time_total;
       the_remaining_time = estimated_time_total; // 合計の所要時間を保存（進捗表示のため）
       all_phase();
     }
-
-
-
-
+    else if (elements[0] == "lc") { // Loading→Collectingの処理を実行
+      estimated_time_total = loading_time_total + collecting_time_total;
+      the_remaining_time = estimated_time_total; // 合計の所要時間を保存（進捗表示のため）
+      loading_collecting();
+    }    
+    
     rx_sig_count_prev = rx_sig_count; // 信号を1回受信したら更新（これで次の命令を受信するまで動作を実行しない）
     //    Serial.print("rx_sig_count = ");
     //    Serial.print(rx_sig_count);
@@ -306,6 +332,7 @@ void loop() {
     //    Serial.println();
   }
 }
+
 /* ステッピングモータを駆動してカラムを前方に動かす関数 */
 void step_front(int step) {
   digitalWrite(STEP_PORT_2, HIGH);
@@ -493,8 +520,30 @@ void collecting() {
   off_pump_12ch();
 }
 
+/* Phase4（Discharge） */
+void discharge() {
+  excecuted_process = "discharge" ;
+  step_front(50);
+  step_back(200);
+  /* 4-1 */
+  on_pump_dba(1);
+  on_pump_dba(2);
+  on_pump_dba(3);
+  delay(t_41 * 1000); // Wait for 7 sec
+  off_pump_dba();
+  /* 4-2 */
+  on_pump_12ch(100, 0);
+  delay(t_42 * 1000); // Wait for 280 sec
+  off_pump_12ch();
+}
+
 void all_phase() {
   washing();
+  loading();
+  collecting();
+}
+
+void loading_collecting() {
   loading();
   collecting();
 }

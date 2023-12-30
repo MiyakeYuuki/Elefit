@@ -19,6 +19,7 @@ int the_remaining_time = 0;
 int washing_progress = 0;
 int loading_progress = 0;
 int collecting_progress = 0;
+int discharge_progress = 0;
 int lf = 10; // ASCIIの改行
 int cr = 13; // ASCIIの行頭復帰
 
@@ -258,22 +259,24 @@ void draw_gauge(int percentage, float y, String name) {
 // Function to draw all gauge, control pump
 void draw() {
   while (port.available()>0) {
-    String progress = port.readStringUntil(lf);
+    String progress = port.readString();
     if (progress != null) {
-      print(progress);
+      //print(progress);
       String time_and_progress_lf = progress.replace("\n", "");
       time_and_progress = time_and_progress_lf.split(",");
       //println(time_and_progress.length);
-      if (time_and_progress.length==4) {
-        //println(time_and_progress[0]);
-        //println(time_and_progress[1]);
-        //println(time_and_progress[2]);
-        //println(time_and_progress[3]);
+      if (time_and_progress.length==5) {
+        println(time_and_progress[0]);
+        println(time_and_progress[1]);
+        println(time_and_progress[2]);
+        println(time_and_progress[3]);
+        println(time_and_progress[4]);
         try {
           the_remaining_time = Integer.parseInt(time_and_progress[0]);
           washing_progress = Integer.parseInt(time_and_progress[1]);
           loading_progress = Integer.parseInt(time_and_progress[2]);
           collecting_progress = Integer.parseInt(time_and_progress[3]);
+          discharge_progress = Integer.parseInt(time_and_progress[4]);
         }
         catch(NumberFormatException e) {
           // エラーが発生したら、残り時間と進捗の更新をスキップ
@@ -292,18 +295,18 @@ void draw() {
     stroke(0, 100, j*255/width, 50);  //引数は(R,G,B,不透明度)の順番
     line(j*1.5, j, j, height/2.1);
   }
-  long temp;
+  //long temp;
   draw_gauge(washing_progress, height/36, "Washing");
   draw_gauge(loading_progress, 5*height/36, "Loading");
   draw_gauge(collecting_progress, 9*height/36, "Collecting");
-  //draw_gauge(discharge_progress, 13*height/36, "Discharge");
+  draw_gauge(discharge_progress, 13*height/36, "Discharge");
 
   // 残り時間表示
   fill(color(0));
   textSize(1.5*font_size);                  //テキストサイズ
   text("The Remaining Time", 2*width/3, 9*height/14);
 
-  temp = the_remaining_time;
+  //temp = the_remaining_time;
   //println(temp);
   //println("washing_time/need_washing_time="+washing_time+"/"+need_washing_time);
   //println("loading_time/need_loading_time="+loading_time+"/"+need_loading_time);
@@ -312,7 +315,7 @@ void draw() {
   if (process_button_flag == true) {
     //temp += temp_Correct;
   } else {
-    temp = 0;
+    //temp = 0;
   }
 
   //int minutes = (int)(Integer.parseInt(time_and_progress[0])/60);
@@ -439,15 +442,16 @@ void AllPhase() {
 }
 /*「LOADING COLLECTING」ボタンが押されたときに実行される関数 */
 void LoadingCollecting() {
-  if (process_toggle_flag == false && process_button_flag == false) {
-    remaining_time = need_loading_time + need_collecting_time;
-    start_loading_time = (long)millis()/1000;
-    start_collecting_time = (long)millis()/1000 + need_loading_time;
-    //Generating Threads
-    LoadingCollecting_exe = new Com_LoadingCollecting();
-    //Execution start
-    LoadingCollecting_exe.start();
-  }
+  port.write("lc,0,0\n");
+  //if (process_toggle_flag == false && process_button_flag == false) {
+  //  remaining_time = need_loading_time + need_collecting_time;
+  //  start_loading_time = (long)millis()/1000;
+  //  start_collecting_time = (long)millis()/1000 + need_loading_time;
+  //  //Generating Threads
+  //  LoadingCollecting_exe = new Com_LoadingCollecting();
+  //  //Execution start
+  //  LoadingCollecting_exe.start();
+  //}
 }
 
 
@@ -465,14 +469,15 @@ void Back() {
 }
 /*「DISCHARGE」ボタンが押されたときに実行される関数 */
 void Discharge() {
-  if (process_toggle_flag == false && process_button_flag == false) {
-    remaining_time = need_discharge_time;
+  port.write("discharge,0,0\n");
+  //if (process_toggle_flag == false && process_button_flag == false) {
+  //  remaining_time = need_discharge_time;
 
-    //Generating Threads
-    Discharge_exe = new Com_Discharge();
-    //Execution start
-    Discharge_exe.start();
-  }
+  //  //Generating Threads
+  //  Discharge_exe = new Com_Discharge();
+  //  //Execution start
+  //  Discharge_exe.start();
+  //}
 }
 /*「CLOSE」ボタンが押されたときに実行される関数 */
 void Close() {
