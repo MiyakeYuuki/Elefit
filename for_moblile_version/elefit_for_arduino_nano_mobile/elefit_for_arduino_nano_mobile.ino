@@ -41,14 +41,14 @@ boolean running_flag = false;   // 処理の実行管理用フラグ
 /* Phase1(Washing)、各処理の実行時間（t_11~t_14）[sec] */
 unsigned long t_11 = 18;
 unsigned long t_12 = 45;
-unsigned long t_13 = 60;  // Wait for 600 sec (test = 60 sec)
+unsigned long t_13 = 600;  // Wait for 600 sec (test = 60 sec)
 unsigned long t_14 = 30;
 unsigned long t_1_error = 3; // ステッピングモータの動作などで発生する遅延
 /* Phase2(Loading)、各処理の実行時間（t_21~t_26）[sec] */
 unsigned long t_21 = 19;
 unsigned long t_22 = 45;
-unsigned long t_23 = 30;  // Wait for 300 sec (test = 30 sec)
-unsigned long t_24 = 25;  // Wait for 250 sec (test = 25 sec)
+unsigned long t_23 = 300;  // Wait for 300 sec (test = 30 sec)
+unsigned long t_24 = 250;  // Wait for 250 sec (test = 25 sec)
 unsigned long t_25 = 4;
 unsigned long t_26 = 60;
 unsigned long t_2_error = 0; // ステッピングモータの動作などで発生する遅延
@@ -175,6 +175,7 @@ void read_data() {
     //    Serial.println();
 
     if (rx_sig_count >= rx_sig_count_prev + 2) {
+      resetFunc(); // 動作中に他のボタンが押されると、現在の動作をキャンセルする
       //      Serial.print("*** Please wait. Excecuting the received command ... ***\n");
       //      Serial.print("*** If you want to stop this process, Press the「CLOSE」button on your app. ***\n");
     }
