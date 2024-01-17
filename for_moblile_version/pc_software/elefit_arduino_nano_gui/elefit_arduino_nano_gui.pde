@@ -10,6 +10,8 @@ int loading_progress = 0;     // Save the Loading progress [%]
 int collecting_progress = 0;  // Save the Collecting progress [%]
 int discharge_progress = 0;   // Save the Discharge progress [%]
 
+boolean reverse;  // If this flag is ture,two pump_12ch rotate reverse.
+
 void setup() {
   /* ディスプレイサイズに合わせて変更 */
   //size(800, 450);  // W:H = 16:9
@@ -137,6 +139,13 @@ void setup() {
     .setColorCaptionLabel(color(230))
     .setValue(false);
 
+  cp5.addToggle("reverse")
+    .setPosition(4*button_width/3, 5 * button_height)
+    .setSize(button_height*4/3, button_height/3)
+    .setFont(cf1)
+    .setMode(ControlP5.SWITCH)
+    .setValue(false);
+
   cp5.addToggle("pump_1")
     .setPosition(button_width/6, 6 * button_height)
     .setSize(button_height/3, button_height/3)
@@ -199,7 +208,7 @@ void draw_gauge(int percentage, float y, String name) {
   // バージョン表示
   fill(color(230));
   textSize(0.6*font_size);
-  text("Elefit Controlller (ver.4a) ", 8.5*width/10, 13.5*height/14);
+  text("Elefit Controlller (ver.4b) ", 8.5*width/10, 13.5*height/14);
 }
 
 // Function to draw all gauge, control pump
@@ -251,6 +260,11 @@ void draw() {
   text("min", 11*width/16 + width/31, 14*height/20);
   text(seconds, 11*width/16 + width/10, 14*height/20);
   text("sec", 11*width/16 + width/7.5, 14*height/20);
+  
+  // 12chポンプがreverseになっていないか調査する
+  if(reverse == true){
+  
+  }
 
 }
 
@@ -286,11 +300,18 @@ void pump_3(boolean theFlag) {
   }
 }
 void pump_12ch(boolean theFlag) {
-  if (theFlag==true) {
+  if (theFlag==true && reverse == false) {
     port.write("on_pump_12ch,100,0\n");
-  } else {
+  } 
+  else if(theFlag==false && reverse == false){
     port.write("off_pump_12ch,0,0\n");
   }
+  else if(theFlag==true && reverse == true){
+    port.write("on_pump_12ch,100,1\n");
+  }
+  else if (theFlag==false && reverse == true) {
+    port.write("off_pump_12ch,0,1\n");
+  } 
 }
 void AllPhase() {
   port.write("all_phase,0,0\n");
