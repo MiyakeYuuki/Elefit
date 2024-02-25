@@ -153,15 +153,39 @@ void read_data() {
 //  Serial.println();
 
   /* スマホ or PC に[動作残り時間(sec), Washingの進捗(%), Loadingの進捗(%), Collectingの進捗(%)]を送信 */
-  Serial.print((int)(the_remaining_time/1000));
+  char buf_rem_t[10];
+  char buf_w_prog[10];
+  char buf_l_prog[10];
+  char buf_c_prog[10];
+  char buf_d_prog[10];
+  
+  sprintf(buf_rem_t, "%04d", (int)(the_remaining_time/1000));
+  sprintf(buf_w_prog, "%03d", (int)(washing_progress * 100));
+  sprintf(buf_l_prog, "%03d", (int)(loading_progress * 100));
+  sprintf(buf_c_prog, "%03d", (int)(collecting_progress * 100));
+  sprintf(buf_d_prog, "%03d", (int)(discharge_progress * 100));
+  
+//  Serial.print((int)(the_remaining_time/1000));
+//  Serial.print(",");
+//  Serial.print((int)(washing_progress * 100));
+//  Serial.print(",");
+//  Serial.print((int)(loading_progress * 100));
+//  Serial.print(",");  
+//  Serial.print((int)(collecting_progress * 100));
+//  Serial.print(",");  
+//  Serial.print((int)(discharge_progress * 100));
+
+  Serial.print(buf_rem_t);
   Serial.print(",");
-  Serial.print((int)(washing_progress * 100));
+  Serial.print(buf_w_prog);
   Serial.print(",");
-  Serial.print((int)(loading_progress * 100));
+  Serial.print(buf_l_prog);
   Serial.print(",");  
-  Serial.print((int)(collecting_progress * 100));
+  Serial.print(buf_c_prog);
   Serial.print(",");  
-  Serial.print((int)(discharge_progress * 100));  
+  Serial.print(buf_d_prog);
+ 
+  
 //  Serial.print("");
   
   if (Serial.available()) {
