@@ -14,7 +14,7 @@ This is an app for the Smartphone (Android) to conrtrol Elefit.
 ### Elefit_remote_controller.aia
 The app's project file. (MIT App Inventor 2)
 
-### ◆ "elefit_microcontroller_program" folder
+## ◆ "elefit_microcontroller_program" folder
 ### elefit_microcontroller_program.ino
 This is a program for microcontroller (Bluno Nano V1.4). 
 
