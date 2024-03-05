@@ -13,7 +13,7 @@ This is a GUI program for the PC to conrtrol Elefit.
 ### Elefit_remote_controller.apk
 This is an app for the Smartphone (Android) to conrtrol Elefit.
 
-<img src = "https://github.com/MiyakeYuuki/Elefit/blob/myspace_tomo/images/smatphone_app.jpg" width="500px">
+<img src = "https://github.com/MiyakeYuuki/Elefit/blob/myspace_tomo/images/smatphone_app.jpg" width="300px">
 
 ### Elefit_remote_controller.aia
 The app's project file. (MIT App Inventor 2)
