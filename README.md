@@ -8,12 +8,12 @@ Elefit is a device used for DNA analysys preparation. It has a compact body, so 
 ### elefit_arduino_nano_gui.pde
 This is a GUI program for the PC to conrtrol Elefit.
 
-![Elefit logo](https://github.com/MiyakeYuuki/Elefit/blob/myspace_tomo/images/pc_app.png "Elefit icon")
+![PC app](https://github.com/MiyakeYuuki/Elefit/blob/myspace_tomo/images/pc_app.png "PC app")
 
 ### Elefit_remote_controller.apk
 This is an app for the Smartphone (Android) to conrtrol Elefit.
 
-![Elefit logo](https://github.com/MiyakeYuuki/Elefit/blob/myspace_tomo/images/smatphone_app.png "Elefit icon")
+![Smartphone app](https://github.com/MiyakeYuuki/Elefit/blob/myspace_tomo/images/smatphone_app.jpg "Smartphone app")
 
 ### Elefit_remote_controller.aia
 The app's project file. (MIT App Inventor 2)
