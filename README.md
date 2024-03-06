@@ -1,7 +1,7 @@
 ![Elefit logo](https://github.com/MiyakeYuuki/Elefit/blob/myspace_tomo/images/Elefit_icon.png "Elefit icon")
 
 # What's elefit
-Elefit is a device used for DNA analysys preparation. It has a compact body, so easy to move.
+Elefit is a device used for DNA analysis preparation. It has a compact body, so easy to move.
 
 # File Description
 ## ◆ "controller_app" folder
